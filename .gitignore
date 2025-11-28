@@ -1,4 +1,31 @@
-node_modules/
-.env.local
-.next/
+# Node modules for all projects
+*/node_modules/
+
+# Build / output folders for all projects
+*/.next/
+*/dist/
+*/build/
+*/out/
+*/coverage/
+
+# Environment variables
+*/.env*
+.env.local   # optional if you want to specifically exclude outer env files
+
+# Git metadata
+.git/
+
+# OS / system files
 .DS_Store
+
+# Logs / debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Misc / certificates
+*.pem
+
+# Vercel / deployment folders
+.vercel

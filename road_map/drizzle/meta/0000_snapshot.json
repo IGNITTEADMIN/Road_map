@@ -1,0 +1,135 @@
+{
+  "id": "6cc0d5fe-6f2a-47ab-b8af-7e46eb5fb8cd",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.content": {
+      "name": "content",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "subject": {
+          "name": "subject",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "chapter_name": {
+          "name": "chapter_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "concept_covered": {
+          "name": "concept_covered",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "video_link": {
+          "name": "video_link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quiz_identifier": {
+          "name": "quiz_identifier",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.quiz": {
+      "name": "quiz",
+      "schema": "",
+      "columns": {
+        "quiz_id": {
+          "name": "quiz_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "quiz_identifier": {
+          "name": "quiz_identifier",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "question_type": {
+          "name": "question_type",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "question_text": {
+          "name": "question_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "question_image": {
+          "name": "question_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "options": {
+          "name": "options",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "correct_answer": {
+          "name": "correct_answer",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "solution_text": {
+          "name": "solution_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "solution_image": {
+          "name": "solution_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
