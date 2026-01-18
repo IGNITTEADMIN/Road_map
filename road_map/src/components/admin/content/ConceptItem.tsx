@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ContentRow } from "@/src/types/content";
 import EditConceptDialog from "./dialogs/EditConceptDialog";
 import YoutubePreview from "./YoutubePreview";
+//import QuizPanel from "../quiz/QuizPanel";
 
 function getThumbnail(url?: string) {
   if (!url) return null;
@@ -36,6 +37,7 @@ export default function ConceptItem({
   const [name, setName] = useState(row.concept);
   const [showEdit, setShowEdit] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
 
   const thumbnail = getThumbnail(row.video_url);
 
@@ -130,6 +132,7 @@ export default function ConceptItem({
         >
           Delete
         </button>
+        <button onClick={()=>{setShowQuiz(true)}}>Quiz</button>
       </div>
 
       <EditConceptDialog
@@ -168,6 +171,8 @@ export default function ConceptItem({
           onClose={() => setShowVideo(false)}
         />
       )}
-    </>
+      
+      
+      </>
   );
 }
