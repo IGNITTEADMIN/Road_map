@@ -1,68 +1,71 @@
-import { pgTable, serial, varchar, text, integer } from "drizzle-orm/pg-core";
+//db/schema.ts
+import { pgEnum, pgTable, serial, varchar, text, integer, char, timestamp } from "drizzle-orm/pg-core";
 
-/* -------------------------------------------------------------------------- */
-/*                               CONTENT TABLE                                */
-/* -------------------------------------------------------------------------- */
-/*
-One row per concept.
-Linked to quiz via quiz_id.
-*/
+export const subjectEnum=pgEnum("subject_enum",["PHYSICS","CHEMISTRY","MATHS",]);
+export const chapter = pgTable("chapter",{
+    id: serial("id").primaryKey(),
 
-export const content = pgTable("content", {
-  id: serial("id").primaryKey(),
-
-  subject: varchar("subject", { length: 50 }).notNull(),
-  chapter: varchar("chapter", { length: 255 }).notNull(),
-  concept: varchar("concept", { length: 255 }).notNull(),
-
-  order_index: integer("order_index").notNull(),
-
-  video_title: varchar("video_title", { length: 255 }).notNull(),
-  video_url: text("video_url").notNull(),
-
-  // FK → quiz.quiz_id (not defined here, but used in app logic)
-  quiz_id: integer("quiz_id").notNull(),
+    subject: subjectEnum("subject").notNull(),
+    chapterName: varchar("chapter_name",{ length:150}).notNull(),
 });
 
+export const concept= pgTable("concept",{
+    id: serial("id").primaryKey(),
 
-/* -------------------------------------------------------------------------- */
-/*                                 QUIZ TABLE                                 */
-/* -------------------------------------------------------------------------- */
-/*
-One row per question.
-Supports MCQ + NUM both.
-*/
+    chapterId: integer("chapter_id").notNull().references(()=>chapter.id,{onDelete:  "cascade" }),
+    conceptName: varchar("concept_name",{length: 250}).notNull(),
+    orderIndex: integer("order_index").notNull(),
+    videoTitle: varchar("video_title",{length: 200}).notNull(),
+    videoUrl: text("video_url").notNull(),
+});
 
-export const quiz = pgTable("quiz", {
+export const quizQuestion = pgTable("quiz_question", {
   id: serial("id").primaryKey(),
 
-  quiz_id: integer("quiz_id").notNull(), // Groups 5 questions per concept
-  question_number: integer("question_number").notNull(), // 1..5
+  conceptId: integer("concept_id")
+    .notNull()
+    .references(() => concept.id, { onDelete: "cascade" }),
 
-  question_type: varchar("question_type", { length: 10 }).notNull(), // "MCQ" or "NUM"
+  type: varchar("type", { length: 20 }).notNull().default("mcq"),
 
-  question_text: text("question_text").notNull(),
-  question_image: text("question_image"), // Cloudinary URL (nullable)
+  question: text("question").notNull(),
+  questionImage: text("question_image"),
 
-  /* ----------------------------- MCQ columns ------------------------------ */
-  optionA_text: text("optionA_text"),
-  optionA_image: text("optionA_image"),
+  optionA: text("optiona"),
+  optionAImage: text("optiona_image"),
 
-  optionB_text: text("optionB_text"),
-  optionB_image: text("optionB_image"),
+  optionB: text("optionb"),
+  optionBImage: text("optionb_image"),
 
-  optionC_text: text("optionC_text"),
-  optionC_image: text("optionC_image"),
+  optionC: text("optionc"),
+  optionCImage: text("optionc_image"),
 
-  optionD_text: text("optionD_text"),
-  optionD_image: text("optionD_image"),
+  optionD: text("optiond"),
+  optionDImage: text("optiond_image"),
 
-  answer_key: varchar("answer_key", { length: 5 }), // A/B/C/D for MCQ
+  answer: char("answer", { length: 1 }),
 
-  /* --------------------------- NUMERIC question --------------------------- */
-  numeric_answer: integer("numeric_answer"), // NUM only
+  solutionText: text("solution_text"),
+  solutionImage: text("solution_image"),
 
-  /* ------------------------- Solution / Explanation ------------------------ */
-  solution_text: text("solution_text"),
-  solution_image: text("solution_image"),
+  orderIndex: integer("order_index").notNull(),
+
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+
+  googleId: varchar("google_id", { length: 255 }).notNull().unique(),
+
+  name: varchar("name", { length: 255 }),
+
+  email: varchar("email", { length: 255 }).notNull().unique(),
+
+  avatarUrl: text("avatar_url"),
+
+  role: varchar("role", { length: 20 }).default("user"),
+
+  createdAt: timestamp("created_at").defaultNow(),
 });

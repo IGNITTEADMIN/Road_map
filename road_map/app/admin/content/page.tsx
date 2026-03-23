@@ -1,66 +1,57 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import SubjectSelector from "@/src/components/admin/content/SubjectSelector";
-import ChapterList from "@/src/components/admin/content/ChapterList";
+import { useState,useEffect } from "react";
+import SubjectTab from "../../components/SubjectTab";
+import { Subject } from "../../components/SubjectTab";
+import ChapterList from "../../components/ChapterList";
+import { ChapterRow } from "@/src/types/content";
 
-interface ContentRow {
-  id: number;
-  subject: string;
-  chapter: string;
-  concept: string;
-  order_index: number;
-  video_title: string;
-  video_url: string;
-  quiz_id: number;
-}
 
-export default function AdminContentPage() {
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const [contentRows, setContentRows] = useState<ContentRow[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default function AdminPage(){
+    const [selectedSubject, setSelectedSubject]= useState< Subject | null>(null);
+    const [loading,setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [chapterRows, setChapterRows]=useState<ChapterRow[]>([])
+    
+    
+    useEffect(()=>{
+        if(!selectedSubject) return;
+        
+        async function fetchChapters(){
+            try{
+                setLoading(true);
+                setError(null);
+                const res=await fetch(`/api/chapters/get?subject=${selectedSubject}`);
+                if(!res.ok){
+                    throw new Error("Failed to fetch chapters");
+                }
+                const data:ChapterRow[] = await res.json();
 
-  useEffect(() => {
-    if (!selectedSubject) return;
+                setChapterRows(data);
+                console.log(data);
+            }catch{
+                setError("Unable to load content");
+            }finally{
+                setLoading(false);
+            }
+        }
 
-    setLoading(true);
-    setError(null);
+        fetchChapters();
+    },[selectedSubject]);
 
-    fetch(`/api/content/list?subject=${selectedSubject}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch content");
-        return res.json();
-      })
-      .then((data) => {
-        setContentRows(data);
-      })
-      .catch(() => {
-        setError("Unable to load content");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [selectedSubject]);
 
-  return (
-    <div>
-      <SubjectSelector
-        selectedSubject={selectedSubject}
-        onSelect={setSelectedSubject}
-      />
+    return (
+        <div>
+            <h2>Select a Subject</h2>
+            <SubjectTab
+                subject={selectedSubject} 
+                onSubjectChange={setSelectedSubject}
+            />
+            {loading && <p>Loading...</p>}
+            {error && <p>{error}</p>}
 
-      {!selectedSubject && <p>Select a subject to view content.</p>}
 
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
-
-      {!loading && selectedSubject && (
-        <ChapterList
-          subject={selectedSubject}
-          contentRows={contentRows}
-        />
-      )}
-    </div>
-  );
+            {selectedSubject && <ChapterList subject={selectedSubject} rows={chapterRows} mode="admin"/>}
+        </div>
+    );
 }

@@ -1,0 +1,30 @@
+Design system:
+
+Backgrounds:
+- bg-black (main)
+- bg-[#111111] (hero)
+- bg-white/5 (cards)
+
+Accent color:
+- #ff6b00
+
+Containers:
+- mx-auto max-w-6xl px-6
+
+Sections:
+- py-16
+
+Cards:
+- rounded-3xl border border-white/10 bg-white/5 p-6
+- hover:-translate-y-1 hover:border-orange-500/60 hover:bg-white/10
+
+Buttons:
+
+Primary
+- rounded-full bg-[#ff6b00] px-8 py-3 font-semibold text-black hover:bg-orange-500
+
+Secondary
+- rounded-full border border-white/10 px-8 py-3 text-gray-200 hover:border-[#ff6b00] hover:text-[#ff6b00]
+
+Icons
+- h-14 w-14 rounded-2xl bg-gradient-to-br from-orange-500/20 to-orange-500/5

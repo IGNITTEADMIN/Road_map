@@ -24,3 +24,148 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Secondary Button Styles */
+.button {
+  height: 50px;
+  width: auto;
+  position: relative;
+  background-color: transparent;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  border-radius: 30px;
+  color: white;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-txt {
+  z-index: 1;
+  font-weight: 800;
+}
+
+.type1::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: width 0.3s ease-in-out;
+  background-color: #ff6b00;
+  border-radius: 30px;
+  visibility: hidden;
+  height: 100%;
+  width: 0;
+  z-index: -1;
+}
+
+.button:hover {
+  box-shadow: 1px 1px 50px rgba(255, 107, 0, 0.3);
+  color: white;
+  border: none;
+}
+
+.type1:hover::after {
+  visibility: visible;
+  width: 100%;
+}
+
+/* Primary Button Styles */
+.button2 {
+  height: 50px;
+  width: auto;
+  position: relative;
+  background-color: transparent;
+  cursor: pointer;
+  border: 2px solid #ff6b00;
+  overflow: hidden;
+  border-radius: 30px;
+  color: #ff6b00;
+  transition: all 0.3s ease-in-out;
+}
+
+.type2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transition: height 0.3s ease-in-out;
+  background-color: white;
+  border-radius: 30px;
+  visibility: hidden;
+  height: 0;
+  width: 100%;
+  z-index: -1;
+}
+
+.button2:hover {
+  box-shadow: 1px 1px 50px rgba(255, 107, 0, 0.3);
+  color: black;
+  border: none;
+}
+
+.type2:hover::after {
+  visibility: visible;
+  height: 100%;
+}
+
+/* Nav Button Styles */
+.nav-button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: color 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  color: #ff6b00;
+}
+
+/* Page Button Styles */
+.page-button {
+  background: #ff6b00;
+  border: none;
+  color: black;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: 600;
+  transition: background 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.page-button:hover {
+  background: #ff8533;
+}
+
+
+
+
+
+
+
+
+
+/* ===== Scrollbar Styling ===== */
+
+/* Width */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track (background) */
+::-webkit-scrollbar-track {
+  background: #0a0a0a; /* near black */
+}
+
+/* Thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15); /* soft gray */
+  border-radius: 999px;
+  transition: background 0.3s ease;
+}
+
+/* Hover effect */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

@@ -1,53 +1,17 @@
-"use client";
+// Server Component — no "use client"
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 
-import { useEffect, useState, useCallback } from "react";
-import SubjectSelector from "@/src/components/admin/content/SubjectSelector";
-import ChapterList from "@/src/components/admin/content/ChapterList";
-import { ContentRow } from "@/src/types/content";
+import AdminPage from "./content/page";
 
-export default function AdminContentPage() {
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const [rows, setRows] = useState<ContentRow[]>([]);
-  const [loading, setLoading] = useState(false);
+export default async function AdminPageWrapper() {
+   
+  const session = await getServerSession(authOptions);
+ console.log(session);
+  if (!session) redirect("/login");
 
-  // 🔁 Central fetch function (single source of truth)
-  const fetchContent = useCallback(async () => {
-    if (!selectedSubject) return;
+  if (session.user?.role !== "admin") redirect("/");
 
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `/api/content/by-subject?subject=${selectedSubject}`
-      );
-      const data = await res.json();
-      setRows(data);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedSubject]);
-
-  // Fetch when subject changes
-  useEffect(() => {
-    fetchContent();
-  }, [fetchContent]);
-
-  return (
-    <div>
-      <SubjectSelector
-        selectedSubject={selectedSubject}
-        onSelect={setSelectedSubject}
-      />
-
-      {!selectedSubject && <p>Select a subject</p>}
-      {loading && <p>Loading...</p>}
-
-      {!loading && selectedSubject && (
-        <ChapterList
-          subject={selectedSubject} 
-          rows={rows}
-          refresh={fetchContent}     
-        />
-      )}
-    </div>
-  );
+  return <AdminPage />;
 }
