@@ -1,9 +1,11 @@
 ///api/chapters/concepts/[conceptId]/route.ts
 import {NextResponse} from "next/server";
 import {deleteConcept, editConcept} from "@/src/db/queries";
+import { requireAdmin } from "@/src/lib/apiAuth";
 
 export async function DELETE(_req:Request,  {params} : {params: Promise<{conceptId:string
 }>}) {
+    await requireAdmin();
     try{
         const {conceptId}=await params;
         //console.log(params);

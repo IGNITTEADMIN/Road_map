@@ -1,14 +1,16 @@
 //./api/components/ChapterList.tsx
 "use client";
 
-import {useState } from "react";
+import {useState ,useEffect} from "react";
 import ChapterTab from "./ChapterTab";
 import {ContentRow, ChapterRow} from "@/src/types/content";
 import { Subject } from "@/app/components/SubjectTab";
 import  AddChapterDialog  from "@/app/components/dialogBoxes/AddChapterDialog";
 import ConceptList from "@/app/components/ConceptList";
 import Button from "@/app/components/ui/Button";
-import { getProgress } from "@/src/utils/progress";
+import { getChapterProgress, getProgressForUser , getUserId} from "@/src/utils/progress";
+import { ConceptProgress } from "@/src/utils/progress";
+import Loader from "@/app/components/ui/Loader";
 
 interface Props{
     subject: Subject;
@@ -23,39 +25,47 @@ export default function ChapterList({ subject, rows, mode="admin" }: Props){
     const [showAddDialog, setShowAddDialog] = useState(false);
     const [expandedChapterId,changeExpandedChapterId] = useState<number | null>(null); 
     const [conceptList,changeConcepts]=useState<ContentRow[] | []>([]);
-    const [loading, setLoading] = useState(false);
+    const [loadingChapterId, setLoadingChapterId] = useState<number | null>(null);
+    const [progressData, setProgressData] = useState<Record<number, ConceptProgress>>({});
+      useEffect(() => {
+          const userId = getUserId();
+          if (!userId) return;
+
+          function load() {
+              const data = getProgressForUser(userId!);
+              setProgressData(data);
+          }
+
+          load();
+          window.addEventListener("storage", load);
+
+          return () => window.removeEventListener("storage", load);
+      }, []);
+
     async function handleClick(id:number){
         if(expandedChapterId==id){
             changeExpandedChapterId(null);
-            changeConcepts([]);
+            changeConcepts([]); 
             return;
         }
         changeExpandedChapterId(id);
-        setLoading(true);
-        try{
-            const res=await fetch(`/api/chapters/concepts/get?chapterId=${id}`);
-            const data:ContentRow[] = await res.json();
-            
-            changeConcepts(data);
-            console.log(data);
-        }catch(err){
+        changeConcepts([]);
+        setLoadingChapterId(id);
+        try {
+                const res = await fetch(`/api/chapters/concepts/get?chapterId=${id}`);
+                const data: ContentRow[] = await res.json();
+
+                await new Promise((res) => setTimeout(res, 500)); // 👈 add this
+
+                changeConcepts(data);
+            }catch(err){
             console.log(err);
         }finally{
-            setLoading(false);
+            setLoadingChapterId(null);
         }
         
     }
-    const progress = getProgress();
-
-    function getChapterProgress(concepts: any[]) {
-        if (!concepts.length) return 0;
-
-        const completed = concepts.filter(
-            (c) => progress[c.id]?.completed
-        ).length;
-
-        return Math.round((completed / concepts.length) * 100);
-    }
+    
     return (
         <div className="space-y-4">
             {
@@ -71,12 +81,23 @@ export default function ChapterList({ subject, rows, mode="admin" }: Props){
                         expandedcI={expandedChapterId}
                         mode={mode}
                         progress={
-                            expandedChapterId === row.chapterId
-                            ? getChapterProgress(conceptList)
+                          expandedChapterId === row.chapterId
+                            ? getChapterProgress(conceptList, progressData)
                             : 0
                         }
                         />
-                    {expandedChapterId==row.chapterId && <ConceptList chapterId={row.chapterId} rows={conceptList} mode={mode}></ConceptList>} 
+                    {expandedChapterId === row.chapterId && (
+                        
+                        loadingChapterId === row.chapterId ? (
+                            <Loader show={loadingChapterId === row.chapterId} />
+                            ) : (
+                            <ConceptList
+                                chapterId={row.chapterId}
+                                rows={conceptList}
+                                mode={mode}
+                            />
+                            )
+                        )}
                 </div>
             )
             

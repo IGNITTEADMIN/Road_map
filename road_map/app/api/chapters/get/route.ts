@@ -1,8 +1,11 @@
+///api/chapters/get/route.ts
 import {NextResponse} from "next/server";
 import {getChaptersBySubject} from "@/src/db/queries";
 import type { Subject } from "@/src/db/queries";
+import { requireAuth} from "@/src/lib/apiAuth";
 
 export async function GET(req:Request) {
+    await requireAuth();
     try{
         const {searchParams}= new URL(req.url);
         const subject=searchParams.get("subject");

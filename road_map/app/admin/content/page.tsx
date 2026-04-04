@@ -1,3 +1,4 @@
+//./app/admin/content/page.tsx
 "use client";
 
 import { useState,useEffect } from "react";
@@ -5,6 +6,7 @@ import SubjectTab from "../../components/SubjectTab";
 import { Subject } from "../../components/SubjectTab";
 import ChapterList from "../../components/ChapterList";
 import { ChapterRow } from "@/src/types/content";
+import Loader from "@/app/components/ui/Loader";
 
 
 export default function AdminPage(){
@@ -47,11 +49,21 @@ export default function AdminPage(){
                 subject={selectedSubject} 
                 onSubjectChange={setSelectedSubject}
             />
-            {loading && <p>Loading...</p>}
             {error && <p>{error}</p>}
 
-
-            {selectedSubject && <ChapterList subject={selectedSubject} rows={chapterRows} mode="admin"/>}
+            {selectedSubject && (
+            loading ? (
+                <div className="py-10 flex justify-center">
+                <Loader show={loading} />
+                </div>
+            ) : (
+                <ChapterList
+                subject={selectedSubject}
+                rows={chapterRows}
+                mode="admin"
+                />
+            )
+            )}
         </div>
     );
 }

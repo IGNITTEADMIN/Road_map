@@ -1,5 +1,6 @@
 import { Question } from "./types";
 import OptionButton from "./OptionButton";
+import MathRenderer from "@/app/components/MathRenderer";
 
 interface Props {
   question: Question;
@@ -32,14 +33,14 @@ export default function QuestionView({
         </div>
       </div>
 
-      <p className="mb-6 text-lg font-medium text-white">{question.text}</p>
+      <p className="mb-6 text-lg font-medium text-white"><MathRenderer text={question.text} /></p>
 
       <div className="space-y-2">
         {question.options.map((opt, i) => (
           <OptionButton
               key={i}
               index={i}
-              text={opt.text}
+              text={<MathRenderer text={opt.text} />}
               selected={selected}
               onClick={() => onSelect(i)}
             />

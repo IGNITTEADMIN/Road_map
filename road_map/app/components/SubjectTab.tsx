@@ -1,4 +1,4 @@
-//./api/components/SubjectTabs.tsx
+//./app/components/SubjectTabs.tsx
 "use client";
 
 import Button from "@/app/components/ui/Button";

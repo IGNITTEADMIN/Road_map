@@ -1,3 +1,4 @@
+//./app/api/auth/[...nextauth]/route.ts
 import NextAuth, { NextAuthOptions, User, Account } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -39,33 +40,36 @@ export const authOptions: NextAuthOptions = {
         },
 
     async jwt({ token, user }) {
+        if (user?.email) {
+          const dbUser = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, user.email!));
 
-      if (user?.email) {
-        const dbUser = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, user.email!));
-
-        if (dbUser.length > 0) {
-          token.role = dbUser[0].role ?? undefined;
+          if (dbUser.length > 0) {
+            token.role = dbUser[0].role ?? undefined;
+            token.profileCompleted = dbUser[0].profileCompleted ?? false; 
+          }
         }
-      }
 
-      return token;
-    },
+        return token;
+      },
 
     async session({ session, token }) {
-
       if (session.user) {
         session.user.role = token.role as string;
+        session.user.profileCompleted = token.profileCompleted as boolean; // ✅ ADD
       }
 
       return session;
     },
 
-    async redirect({ baseUrl }) {
-      return baseUrl + "/learn";
-    },
+    async redirect({ baseUrl, url }) {
+        if (url.startsWith(baseUrl)) {
+        }
+
+        return baseUrl;
+      },
   },
 
   secret: process.env.NEXTAUTH_SECRET,

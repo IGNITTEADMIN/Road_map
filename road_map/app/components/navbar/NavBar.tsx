@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import ProfileDropdown from "./ProfileDropdown";
-import Button from "@/app/components/ui/Button";
 import ResetProgress from "@/app/components/ResetProgress";
 
 export default function Navbar() {
@@ -13,77 +12,66 @@ export default function Navbar() {
 
   const isAdmin = session?.user?.role === "admin";
 
+  // Common button style
+  const buttonClass = "nav-button text-sm font-medium px-5 py-2";
+
   return (
-    <nav className="bg-black/90 border-b border-white/10 px-6 py-4 text-white backdrop-blur-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between">
+    <nav className="sticky top-0 z-50 bg-black/90 backdrop-blur-md border-b border-white/10 px-6 py-3">
+      <div className="mx-auto max-w-6xl flex items-center justify-between">
         
         {/* Logo */}
-        <Link href="/" className="text-lg font-bold tracking-tight text-white">
+        <Link href="/" className="text-2xl font-bold text-white tracking-tight">
           LearnPlatform
         </Link>
 
-        <div className="flex flex-wrap items-center gap-4">
+        {/* Links & Actions */}
+        <div className="flex items-center gap-4">
 
           {/* Public Links */}
-          <Link
-            href="/about"
-            className="text-sm font-medium text-gray-200 transition hover:text-white"
-          >
+          <Link href="/about" className={buttonClass}>
             About
           </Link>
 
-          <Link
-            href="/contact"
-            className="text-sm font-medium text-gray-200 transition hover:text-white"
-          >
+          <Link href="/contact" className={buttonClass}>
             Contact
           </Link>
 
           {/* Learn Button */}
           {session && (
-            <Button
-              variant="nav"
-              className="px-4 py-2 text-sm"
+            <button
+              className={buttonClass}
               onClick={() => router.push("/learn")}
             >
               Learn
-            </Button>
+            </button>
           )}
 
           {/* Admin Link */}
           {session && isAdmin && (
-            <Link
-              href="/admin"
-              className="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-orange-500 hover:text-white"
-            >
+            <Link href="/admin" className={buttonClass}>
               Admin
             </Link>
           )}
 
           {/* User Dashboard */}
           {session && (
-            <Link
-              href="/user/dashboard"
-              className="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-orange-500 hover:text-white"
-            >
+            <Link href="/user/dashboard" className={buttonClass}>
               Dashboard
             </Link>
           )}
 
-          {/* Login if not authenticated */}
+          {/* Login */}
           {!session && (
-            <Link
-              href="/login"
-              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-orange-500 hover:text-white"
-            >
+            <Link href="/login" className={buttonClass}>
               Login
             </Link>
           )}
-          <div className="flex items-center gap-3">
-            <ResetProgress />
-          </div>
-          {session && <ProfileDropdown />}
 
+          {/* Reset Progress */}
+          <ResetProgress />
+
+          {/* Profile */}
+          {session && <ProfileDropdown />}
         </div>
       </div>
     </nav>

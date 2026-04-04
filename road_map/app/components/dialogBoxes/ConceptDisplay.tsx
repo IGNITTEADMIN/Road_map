@@ -1,3 +1,4 @@
+//./app/components/dialogBoxes/ConceptDisplay.tsx
 "use client";
 
 import { useState } from "react";
@@ -28,6 +29,7 @@ export default function ConceptDisplay({
   const [loading, setLoading] = useState(false);
 
   async function handleSave() {
+    setLoading(true);
     try {
       const res = await fetch(`/api/chapters/concepts/${conceptId}`, {
         method: "PUT",

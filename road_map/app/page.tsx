@@ -1,3 +1,4 @@
+//./app/page.tsx
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
@@ -16,7 +17,6 @@ import Footer from "@/app/components/landing/Footer";
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
 
-  // Keep your existing authentication logic
   if (session) {
     if (session.user?.role === "admin") {
       redirect("/admin");
@@ -25,7 +25,6 @@ export default async function HomePage() {
     }
   }
 
-  // Landing page for unauthenticated users
   return (
     <>
 

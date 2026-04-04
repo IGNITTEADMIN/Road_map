@@ -1,21 +1,54 @@
+//./app/components/dashboard/StatsCards.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import { getStats } from "@/src/utils/dashboard";
+import { useContentData } from "@/src/hooks/useContentData";
+import {
+  getUserId,
+  getProgressForUser,
+} from "@/src/utils/progress";
 
 export default function StatsCards() {
-  const [stats, setStats] = useState({ completion: 0 });
+  const [stats, setStats] = useState({
+    completion: 0,
+    total: 0,
+    completed: 0,
+  });
 
-  useEffect(() => {
-    const dummyConcepts = Array.from({ length: 50 }, (_, i) => ({ id: i + 1 }));
-    setStats(getStats(dummyConcepts));
-  }, []);
+  const { conceptsByChapter } = useContentData();
+
+      useEffect(() => {
+      const userId = getUserId();
+      if (!userId) return;
+
+      if (!Object.keys(conceptsByChapter).length) return;
+
+      const progress = getProgressForUser(userId);
+
+      const allConcepts = Object.values(conceptsByChapter).flat();
+
+      const totalConcepts = allConcepts.length;
+
+      const completed = Object.values(progress).filter(
+        (p) => p.completed
+      ).length;
+
+      const completion = totalConcepts
+        ? Math.round((completed / totalConcepts) * 100)
+        : 0;
+
+      setStats({
+        completion,
+        total: totalConcepts,
+        completed,
+      });
+    }, [conceptsByChapter]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Card title="Roadmap Completion" value={`${stats.completion}%`} />
+      <Card title="Concepts Done" value={`${stats.completed}/${stats.total}`} />
       <Card title="Quizzes Passed" value="--" />
-      <Card title="Watch Time" value="--" />
     </div>
   );
 }

@@ -14,18 +14,22 @@
     "@neondatabase/serverless": "^1.0.2",
     "@notionhq/client": "^2.2.7",
     "cloudinary": "^2.9.0",
+    "csv-parse": "^6.2.1",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.7",
+    "katex": "^0.16.43",
     "next": "16.0.5",
     "next-auth": "^4.24.13",
     "postgres": "^3.4.7",
     "psql": "^0.0.1",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "react-katex": "^3.1.0",
+    "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20.19.25",
+    "@types/node": "^20.19.37",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.7",
@@ -33,6 +37,7 @@
     "eslint-config-next": "16.0.5",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }

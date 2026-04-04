@@ -1,7 +1,8 @@
-//db/queries.ts
+//@src/db/queries.ts
 import {db} from "./client";
 import {chapter , concept, subjectEnum , quizQuestion } from "./schema";
-import {eq, and, asc,sql} from "drizzle-orm";
+import {eq, and, asc,sql, desc} from "drizzle-orm";
+import { QuizQuestionRow } from "../types/content";
 
 export type Subject=(typeof subjectEnum.enumValues)[number];
 export type QuizQuestionInsert = {
@@ -26,11 +27,27 @@ export type QuizQuestionInsert = {
   solutionImage?: string;
 }
 
-export async function insertChapter(subject:Subject, chapterName:string){
-    return await db.insert(chapter).values({
-        subject,
-        chapterName:chapterName,
-    });
+export async function insertChapter(
+  subject: Subject,
+  chapterName: string,
+  clusterTag?: string
+) {
+  const maxOrderRow = await db
+    .select({
+      maxOrder: sql<number>`MAX("order")`
+    })
+    .from(chapter)
+    .where(eq(chapter.subject, subject))
+    .execute();
+
+  const nextOrder = (maxOrderRow[0]?.maxOrder ?? 0) + 1;
+
+  return await db.insert(chapter).values({
+    subject,
+    chapterName,
+    clusterTag: clusterTag ?? chapterName,
+    order: nextOrder,
+  });
 }
 
 export async function insertConcept(chapterId:number, conceptName:string,orderIndex:number, videoTitle: string, videoUrl:string ){
@@ -39,8 +56,15 @@ export async function insertConcept(chapterId:number, conceptName:string,orderIn
     );
 }
 
-export async function getChaptersBySubject(subjectName:Subject){
-    return await db.select({chapterId:chapter.id,chapterName:chapter.chapterName}).from(chapter).where(eq(chapter.subject,subjectName));
+export async function getChaptersBySubject(subjectName: Subject) {
+  return await db
+    .select({
+      chapterId: chapter.id,
+      chapterName: chapter.chapterName,
+      clusterTag: chapter.clusterTag,
+    })
+    .from(chapter)
+    .where(eq(chapter.subject, subjectName));
 }
 
 export async function getConceptsByChapter(chapterId: number){

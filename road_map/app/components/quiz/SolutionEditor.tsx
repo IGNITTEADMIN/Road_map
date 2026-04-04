@@ -1,7 +1,8 @@
-// components/quiz/AnswerSolutionEditor.tsx
+// ./components/quiz/SolutionEditor.tsx
 
 import { Question } from "./types";
 import { uploadToCloudinary } from "./cloudinary";
+import MathRenderer from "@/app/components/MathRenderer";
 
 interface Props {
   question: Question;
@@ -43,6 +44,9 @@ export default function SolutionEditor({ question, onChange }: Props) {
           placeholder="Explain the answer..."
           className="w-full h-24 px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-white resize-none focus:border-[#ff6b00] focus:outline-none transition-colors"
         />
+        <div className="p-3 rounded-lg bg-black/30 text-white text-sm">
+          <MathRenderer text={question.solutionText} />
+        </div>
       </div>
 
       <div>

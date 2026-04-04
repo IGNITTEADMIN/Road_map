@@ -1,6 +1,6 @@
 interface Props {
   index: number;
-  text: string;
+  text: React.ReactNode;
   selected?: number | null;
   onClick: () => void;
 }
@@ -39,10 +39,9 @@ export default function OptionButton({
         {String.fromCharCode(65 + index)}
       </div>
 
-      {/* Option Text */}
-      <span className="text-left text-white/90">
+      <div className="text-left text-white/90">
         {text}
-      </span>
+      </div>
     </button>
   );
 }

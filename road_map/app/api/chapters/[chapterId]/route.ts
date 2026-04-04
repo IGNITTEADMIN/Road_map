@@ -1,18 +1,20 @@
+//./api/chapters/[chapterId]/route.ts
 import {NextResponse} from "next/server";
 import {deleteChapter} from "@/src/db/queries";
 import {editConcept} from "@/src/db/queries";
 import {renameChapter} from "@/src/db/queries";
-export async function DELETE(_req:Request,  {params} : {params: Promise<{chapterId:string
-}>}) {
-    try{
-        const {chapterId}=await params;
-        await deleteChapter(Number(chapterId));
-        return NextResponse.json({ success:true});
-        const result=await deleteChapter(Number(chapterId));
-        return NextResponse.json(result,{ status:201});
-    }catch(err:any) {
-        return NextResponse.json({error:err.message},{status:500});
-    }
+import { requireAdmin } from "@/src/lib/apiAuth";
+
+export async function DELETE(_req: Request, { params }: { params: { chapterId: string } }) {
+  try {
+    const { chapterId } = params;
+
+    await deleteChapter(Number(chapterId));
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
 
 

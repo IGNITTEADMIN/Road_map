@@ -1,6 +1,7 @@
 //./api/components/quiz/OptionEditor.tsx
 import { Option } from "./types";
 import { uploadToCloudinary } from "./cloudinary";
+import MathRenderer from "@/app/components/MathRenderer";
 
 interface Props {
   option: Option;
@@ -17,6 +18,9 @@ export default function OptionEditor({ option, onChange }: Props) {
         placeholder="Option text"
         className="w-full px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:border-[#ff6b00] focus:outline-none transition-colors"
       />
+      <div className="p-3 rounded-lg bg-black/30 text-white text-sm">
+        <MathRenderer text={option.text} />
+      </div>
 
       <div>
         <label className="text-white font-medium block mb-2">Option Image:</label>

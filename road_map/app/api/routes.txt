@@ -1,0 +1,97 @@
+🚀 Learning Platform – Route Architecture
+📍 Overview
+
+This application is a role-based learning platform with:
+
+👤 Users → Learn, track progress, take quizzes
+👑 Admins → Manage content (chapters, concepts, quizzes)
+🌐 Frontend Routes
+🟢 Public Routes
+/
+Landing page
+Redirects logged-in users based on role
+/login
+Google authentication via NextAuth
+/profile
+User profile completion form
+Required before accessing learning content
+👤 User Routes (Protected)
+/user
+Main learning interface
+Subject → Chapters → Concepts
+/user/dashboard
+Stats, streak, progress, recommendations
+🔒 Access Rules
+Must be authenticated
+Must have role = user
+Must have profileCompleted = true
+👑 Admin Routes (Protected)
+/admin
+Manage subjects, chapters, concepts, quizzes
+🔒 Access Rules
+Must be authenticated
+Must have role = admin
+🔌 API Routes
+🔐 Authentication
+/api/auth/[...nextauth]
+Handles Google login
+Injects:
+role
+profileCompleted
+📚 Chapters
+Route	Method	Purpose	Access
+/api/chapters/get	GET	Fetch chapters by subject	User
+/api/chapters/add	POST	Create chapter	Admin
+/api/chapters/[chapterId]	PUT	Rename chapter	Admin
+/api/chapters/[chapterId]	DELETE	Delete chapter	Admin
+🧠 Concepts
+Route	Method	Purpose	Access
+/api/chapters/concepts/get	GET	Fetch concepts	User
+/api/chapters/concepts/add	POST	Add concept	Admin
+/api/chapters/concepts/[conceptId]	PUT	Edit concept	Admin
+/api/chapters/concepts/[conceptId]	DELETE	Delete concept	Admin
+📝 Quiz
+Route	Method	Purpose	Access
+/api/quiz/get	GET	Fetch quiz	User
+/api/quiz/update	PUT	Replace quiz	Admin
+👤 User
+Route	Method	Purpose	Access
+/api/user/profile	POST	Save profile & mark complete	Authenticated
+☁️ Cloudinary
+Route	Method	Purpose	Access
+/api/sign-cloudinary	POST	Generate upload signature	Public
+🔄 Application Flow
+🧭 User Journey
+Landing (/)
+   ↓
+Login (Google)
+   ↓
+Check profileCompleted
+   ↓
+IF NOT → /profile
+   ↓
+Submit profile
+   ↓
+Redirect → /user
+   ↓
+Select Subject
+   ↓
+Chapters → Concepts
+   ↓
+Watch video / Take quiz
+   ↓
+Progress tracked (localStorage)
+   ↓
+Dashboard insights
+👑 Admin Flow
+Login
+   ↓
+Redirect → /admin
+   ↓
+Select subject
+   ↓
+Manage chapters
+   ↓
+Manage concepts
+   ↓
+Add quizzes

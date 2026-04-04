@@ -4,12 +4,10 @@
 import { useState, useEffect } from "react";
 import { Question } from "./types";
 import { mapRowToQuestion } from "./mappers";
-
-import QuizTimer from "./QuizTimer";
 import QuestionView from "./QuestionView";
 import ProgressBar from "./ProgressBar";
 import QuestionList from "./QuestionList";
-import { markConceptCompleted } from "@/src/utils/progress";
+import { markConceptCompleted, getUserId } from "@/src/utils/progress";
 
 import Button from "@/app/components/ui/Button";
 
@@ -54,10 +52,13 @@ export default function QuizAttemptPanel({
   
   useEffect(() => {
   if (quizFinished) {
+    const userId = getUserId();
+    if (!userId) return;
+
     const score = calculateScore();
-    markConceptCompleted(conceptId, score);
+    markConceptCompleted(userId, conceptId, score);
   }
-}, [quizFinished]);
+}, [quizFinished, conceptId]);
 
   useEffect(() => {
   if (quizFinished) return;

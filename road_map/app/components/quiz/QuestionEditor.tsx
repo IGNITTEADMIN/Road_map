@@ -3,6 +3,7 @@ import { Question } from "./types";
 import OptionEditor from "./OptionEditor";
 import SolutionEditor from "./SolutionEditor";
 import { uploadToCloudinary } from "./cloudinary";
+import MathRenderer from "@/app/components/MathRenderer";
 
 interface Props {
   question: Question;
@@ -16,11 +17,16 @@ export default function QuestionEditor({ question, onChange }: Props) {
   return (
     <div className="space-y-4">
       <textarea
-        value={question.text}
-        onChange={e => change({ text: e.target.value })}
-        placeholder="Question text"
-        className="w-full h-24 px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-white resize-none"
-      />
+      value={question.text}
+      onChange={e => change({ text: e.target.value })}
+      placeholder="Question text (Use $...$ for math)"
+      className="w-full h-24 px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-white resize-none"
+    />
+
+      {/* Live Preview */}
+      <div className="p-3 rounded-lg bg-black/30 text-white">
+        <MathRenderer text={question.text} />
+      </div>
 
       <input
         type="file"

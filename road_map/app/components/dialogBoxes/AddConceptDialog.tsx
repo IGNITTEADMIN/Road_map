@@ -1,3 +1,4 @@
+//./app/components/dialogBoxes/AddConceptDialog.tsx
 "use client";
 
 import {useState } from "react";
@@ -20,6 +21,7 @@ export default function AddConceptDialog({chapterId, onClose, orderIndex}: Props
             alert("Chaptername needed");
             return;
         }
+        setLoading(true);
         try{
             const res=await fetch(`/api/chapters/concepts/add`, {
             method:"POST",

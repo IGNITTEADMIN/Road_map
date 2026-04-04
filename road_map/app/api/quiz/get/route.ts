@@ -1,8 +1,10 @@
 // app/api/quiz/get/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getQuizQuestions } from "@/src/db/queries"; 
+import { requireAuth } from "@/src/lib/apiAuth";
 
 export async function GET(req: NextRequest) {
+  await requireAuth();
   try {
     const { searchParams } = new URL(req.url);
     const conceptId = searchParams.get("conceptId");

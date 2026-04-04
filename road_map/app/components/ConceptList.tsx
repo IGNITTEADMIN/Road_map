@@ -1,4 +1,4 @@
-///api/components/ConceptList.tsx
+///app/components/ConceptList.tsx
 "use client";
 
 import {useState } from "react";
@@ -16,29 +16,7 @@ interface Props{
 
 
 export default function ConceptList({chapterId, rows, mode="admin" }: Props){
-    const [loading, setLoading] = useState(false);
     const [showAddDialog, setShowAddDialog] = useState(false);
-    /*async function handleClick(id:number){
-        if(expandedChapterId==id){
-            changeExpandedChapterId(null);
-            changeConcepts([]);
-            return;
-        }
-        changeExpandedChapterId(id);
-        setLoading(true);
-        try{
-            const res=await fetch(`/api/chapters/concepts/get?chapterId=${id}`);
-            const data:ContentRow[] = await res.json();
-            
-            changeConcepts(data);
-            console.log(data);
-        }catch(err){
-            console.log(err);
-        }finally{
-            setLoading(false);
-        }
-        
-    }*/
     return (
         <div className="ml-6 space-y-4">
             {    mode === "admin" && showAddDialog && <AddConceptDialog chapterId={chapterId} orderIndex={rows.length} onClose={()=>{setShowAddDialog(false)}}></AddConceptDialog>}

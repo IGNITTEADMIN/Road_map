@@ -1,7 +1,10 @@
+///./app/api/chapters/concepts/get/route.ts
 import {NextResponse} from "next/server";
 import {getConceptsByChapter} from "@/src/db/queries";
+import { requireAuth } from "@/src/lib/apiAuth";
 
 export async function GET(req:Request) {
+    await requireAuth();
     try{
         const {searchParams}= new URL(req.url);
         const chapterId=searchParams.get("chapterId");
@@ -14,7 +17,6 @@ export async function GET(req:Request) {
             const result=await getConceptsByChapter(Number(chapterId));
         return NextResponse.json(result,{ status:201});
         }
-        
     }catch(err:any) {
         return NextResponse.json({error:err.message},{status:500});
     }
