@@ -8,9 +8,11 @@ import ClusterTab from "@/app/components/ClusterTab";
 interface Props {
   groupedChapters: Record<string, ChapterRow[]>;
   subject: string;
+  targetConceptId?: number | null;
+  targetChapterId?: number | null;
 }
 
-export default function ClusterList({ groupedChapters, subject }: Props) {
+export default function ClusterList({ groupedChapters, subject,targetChapterId,targetConceptId }: Props) {
   const [expandedCluster, setExpandedCluster] = useState<string | null>(null);
 
   return (
@@ -31,6 +33,8 @@ export default function ClusterList({ groupedChapters, subject }: Props) {
               expandedCluster === clusterName ? null : clusterName
             )
           }
+          targetConceptId={targetConceptId} 
+          targetChapterId={targetChapterId}
         />
       ))}
     </div>

@@ -1,3 +1,4 @@
+//./api/chapters/concepts/delete/route.ts
 import {NextResponse} from "next/server";
 import {deleteConcept} from "@/src/db/queries";
 import type { Subject } from "@/src/db/queries";

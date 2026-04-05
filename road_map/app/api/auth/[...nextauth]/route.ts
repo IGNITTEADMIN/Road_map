@@ -40,20 +40,26 @@ export const authOptions: NextAuthOptions = {
         },
 
     async jwt({ token, user }) {
-        if (user?.email) {
-          const dbUser = await db
-            .select()
-            .from(users)
-            .where(eq(users.email, user.email!));
-
-          if (dbUser.length > 0) {
-            token.role = dbUser[0].role ?? undefined;
-            token.profileCompleted = dbUser[0].profileCompleted ?? false; 
+          // First time login
+          if (user?.email) {
+            token.email = user.email;
           }
-        }
 
-        return token;
-      },
+          // 🔥 ALWAYS fetch latest user data
+          if (token.email) {
+            const dbUser = await db
+              .select()
+              .from(users)
+              .where(eq(users.email, token.email));
+
+            if (dbUser.length > 0) {
+              token.role = dbUser[0].role ?? "user";
+              token.profileCompleted = dbUser[0].profileCompleted ?? false;
+            }
+          }
+
+          return token;
+        },
 
     async session({ session, token }) {
       if (session.user) {

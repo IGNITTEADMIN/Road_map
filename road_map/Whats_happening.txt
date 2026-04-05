@@ -1,0 +1,139 @@
+1) 👤 What a USER currently sees
+Main Learning Flow
+Select subject (PHYSICS / CHEMISTRY / MATHS)
+See clusters → chapters → concepts
+Expand chapters to view concepts
+For each concept:
+✅ Mark as completed (checkbox)
+📺 Watch video
+🧠 Take quiz
+🏷 See status (Completed / In Progress)
+Dashboard Features
+📊 Overall progress (%)
+📚 Subject-wise progress
+🧩 Cluster-wise progress
+🔥 Streak (days)
+▶️ Continue Learning (last accessed concept)
+🎯 Next milestone (static UI)
+Behind the scenes (for user)
+Progress stored in localStorage
+No backend save for progress
+Uses:
+markConceptCompleted
+markConceptAccessed
+getProgressForUser
+2) 🛠 What an ADMIN can do (features you built)
+Content Management
+➕ Add chapter
+✏️ Rename chapter
+❌ Delete chapter
+➕ Add concept
+✏️ Edit concept
+❌ Delete concept
+Quiz Management
+➕ Add quiz questions
+🔄 Replace quiz questions
+Content Structure Control
+Organize:
+Subjects → Clusters → Chapters → Concepts
+Media
+Upload images via Cloudinary (signed API)
+3) 🔄 Flow of each functionality (end-to-end)
+🔹 A. Load Learning Page (User)
+UI (ClusterList / ChapterList)
+    ↓
+useContentData()
+    ↓
+GET /api/chapters/get?subject=...
+    ↓
+GET /api/chapters/concepts/get?chapterId=...
+    ↓
+UI renders clusters → chapters → concepts
+🔹 B. Expand Chapter
+User clicks ChapterTab
+    ↓
+fetch(`/api/chapters/concepts/get?chapterId=X`)
+    ↓
+ConceptList renders
+🔹 C. Mark Concept Completed
+Checkbox click
+    ↓
+markConceptCompleted(userId, conceptId)
+    ↓
+localStorage updated
+    ↓
+storage event triggers
+    ↓
+useEffect reloads progress
+    ↓
+UI updates
+🔹 D. Watch Video
+Thumbnail click
+    ↓
+markConceptAccessed(userId, conceptId)
+    ↓
+localStorage updated (lastAccessedAt)
+    ↓
+Video modal opens
+🔹 E. Take Quiz
+Click "Take Quiz"
+    ↓
+GET /api/quiz/get?conceptId=X
+    ↓
+QuizAttemptPanel renders
+    ↓
+(After attempt → likely stored locally, not DB)
+🔹 F. Continue Learning (Dashboard)
+useContentData()
+    ↓
+getProgressForUser()
+    ↓
+getContinueLearning()
+    ↓
+Shows last accessed OR next incomplete concept
+🔹 G. Admin → Add Chapter
+AddChapterDialog submit
+    ↓
+POST /api/chapters/add
+    ↓
+DB insert
+    ↓
+UI refresh (manual / implicit)
+🔹 H. Admin → Edit Chapter
+Edit input → Enter
+    ↓
+PUT /api/chapters/{chapterId}
+    ↓
+DB update
+🔹 I. Admin → Delete Chapter
+Click delete
+    ↓
+DELETE /api/chapters/{chapterId}
+    ↓
+DB delete
+🔹 J. Admin → Add Concept
+AddConceptDialog
+    ↓
+POST /api/chapters/concepts/add
+    ↓
+DB insert
+🔹 K. Admin → Edit Concept
+Edit concept
+    ↓
+PUT /api/chapters/concepts/{conceptId}
+    ↓
+DB update
+🔹 L. Admin → Delete Concept
+Click delete
+    ↓
+DELETE /api/chapters/concepts/{conceptId}
+🔹 M. Profile Completion Flow
+User logs in
+    ↓
+POST /api/user/profile
+    ↓
+DB → profileCompleted = true
+    ↓
+GET /api/user/check-profile
+    ↓
+Frontend decides access

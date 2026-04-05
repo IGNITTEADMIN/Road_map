@@ -15,7 +15,6 @@ interface Props {
   conceptList: ContentRow[];
   expandedcI: number | null; // index of expanded chapter
   mode?: "admin" | "user";
-  progress?: number;
 }
 
 export default function ChapterTab({
@@ -24,7 +23,6 @@ export default function ChapterTab({
   onClick,
   conceptList,
   mode = "admin",
-  progress,
   expandedcI,
 }: Props) {
   const [isEditing, changeIsEditing] = useState(false);
@@ -63,15 +61,6 @@ export default function ChapterTab({
       className="group mb-4 rounded-3xl border border-white/10 bg-white/5 p-5 shadow-sm transition hover:-translate-y-1 hover:border-[#ff6b00] hover:bg-white/10 cursor-pointer"
       onClick={onClick}
     >
-      {/* PROGRESS BAR - Only shown when expanded */}
-      {mode === "user" && progress !== undefined && isExpanded && (
-        <div className="mt-4 mb-4 w-full bg-white/10 rounded-full h-2">
-          <div
-            className="bg-yellow-500 h-2 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
-      )}
 
       {/* Chapter Name / Editing */}
       <div className="flex items-center justify-between">

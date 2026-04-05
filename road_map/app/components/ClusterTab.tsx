@@ -10,6 +10,8 @@ interface Props {
   subject: string;
   expanded: boolean;
   onToggle: () => void;
+  targetConceptId?: number | null;
+targetChapterId?: number | null;
 }
 
 export default function ClusterTab({
@@ -18,6 +20,8 @@ export default function ClusterTab({
   subject,
   expanded,
   onToggle,
+  targetChapterId,
+  targetConceptId
 }: Props) {
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
@@ -37,6 +41,8 @@ export default function ClusterTab({
             subject={subject}
             rows={chapters}
             mode="user"
+            targetConceptId={targetConceptId}
+            targetChapterId={targetChapterId}
           />
         </div>
       )}

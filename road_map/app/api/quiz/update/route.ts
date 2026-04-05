@@ -2,7 +2,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { replaceQuizQuestions } from "@/src/db/queries";
+import { requireAdmin } from "@/src/lib/apiAuth";
 export async function PUT(req: NextRequest) {
+  await requireAdmin();
   try {
     const { searchParams } = new URL(req.url);
     const conceptIdParam = searchParams.get("conceptId");

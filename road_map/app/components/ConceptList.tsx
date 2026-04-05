@@ -7,15 +7,15 @@ import { Subject } from "@/app/components/SubjectTab";
 import  AddConceptDialog  from "@/app/components/dialogBoxes/AddConceptDialog";
 import ConceptTab from "@/app/components/ConceptTab";
 import Button from "@/app/components/ui/Button";
-interface Props{
-    chapterId: number;
-    rows: ContentRow[];
-    mode?: "admin" | "user";
-    //refresh: ()=> void;
+interface Props {
+  chapterId: number;
+  rows: ContentRow[];
+  mode?: "admin" | "user";
+  targetConceptId?: number | null;
 }
 
 
-export default function ConceptList({chapterId, rows, mode="admin" }: Props){
+export default function ConceptList({chapterId, rows, mode="admin" ,targetConceptId=null}: Props){
     const [showAddDialog, setShowAddDialog] = useState(false);
     return (
         <div className="ml-6 space-y-4">
@@ -30,6 +30,7 @@ export default function ConceptList({chapterId, rows, mode="admin" }: Props){
                     video_title={row.videoTitle}
                     video_url={row.videoUrl}
                     mode={mode}
+                    targetConceptId={targetConceptId}
                     //onClick={()=>handleClick(row.chapterId)}
                     //expandedcI={expandedChapterId}
                 >

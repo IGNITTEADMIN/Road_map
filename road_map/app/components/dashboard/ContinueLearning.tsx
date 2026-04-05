@@ -1,42 +1,69 @@
 //./app/components/dashboard/ContinueLearning.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { getUserId, getProgressForUser } from "@/src/utils/progress";
-import { getContinueLearning } from "@/src/utils/progress";
-import { useContentData } from "@/src/hooks/useContentData";
+import { useRouter } from "next/navigation";
+import { useProgressMeta } from "@/src/hooks/useProgressMeta";
+import { getNextConcept } from "@/src/utils/progressUtils";
 
-export default function ContinueLearning() {
-  const [concept, setConcept] = useState<any>(null);
-  const { conceptsByChapter } = useContentData();
+interface Props {
+  progress: Record<number, any>;
+}
 
-  useEffect(() => {
-  const userId = getUserId();
-  if (!userId) return;
+export default function ContinueLearning({ progress }: Props) {
+  const router = useRouter();
+  const { meta, loading } = useProgressMeta();
 
-  const progress = getProgressForUser(userId);
+  if (loading) {
+    return (
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+        Loading...
+      </div>
+    );
+  }
 
-  const allConcepts = Object.values(conceptsByChapter).flat();
+  if (!meta) {
+    return (
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+        Error loading data
+      </div>
+    );
+  }
 
-  const next = getContinueLearning(allConcepts, progress);
-  setConcept(next);
-}, [conceptsByChapter]);
+  // 🔹 Get next concept using proper logic
+  const next = getNextConcept(meta, progress);
 
-  if (!concept) return null;
+  if (!next) {
+    return (
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+        🎉 You've completed everything!
+      </div>
+    );
+  }
+
+  function handleContinue() {
+    if(!next) return;
+    router.push(
+      `/learn?subject=${next.subject}&chapterId=${next.chapterId}&conceptId=${next.conceptId}`
+    );
+  }
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-      <h2 className="text-xl font-semibold mb-2">Continue Learning</h2>
-
-      <p className="text-white/80">{concept.conceptName}</p>
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-5 flex items-center justify-between">
+      <div>
+        <p className="text-sm text-gray-400">Continue Learning</p>
+        <h3 className="text-lg font-semibold text-white">
+          Concept #{next.conceptId}
+        </h3>
+        <p className="text-sm text-gray-500">
+          Chapter #{next.chapterId} • {next.subject}
+        </p>
+      </div>
 
       <button
-        className="mt-4 px-4 py-2 bg-yellow-500 rounded-xl text-black font-semibold"
-        onClick={() => {
-          alert(`Open concept ${concept.conceptName}`);
-        }}
+        onClick={handleContinue}
+        className="px-4 py-2 rounded-xl bg-white text-black font-semibold"
       >
-        Resume
+        Continue
       </button>
     </div>
   );

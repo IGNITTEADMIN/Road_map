@@ -3,19 +3,11 @@
 
 import AddConceptDialog from "@/app/components/dialogBoxes/AddConceptDialog";
 import Button from "@/app/components/ui/Button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ConceptDisplay from "@/app/components/dialogBoxes/ConceptDisplay";
 import QuizPanel from "@/app/components/quiz/QuizPanel";   
 import QuizAttemptPanel from "@/app/components/quiz/QuizAttemptPanel";
-import ProgressBadge from "@/app/components/ProgressBadge";
-
-import { 
-  markConceptCompleted, 
-  unmarkConceptCompleted, 
-  getProgressForUser,
-  getUserId,
-  markConceptAccessed
-} from "@/src/utils/progress";
+import { useProgressContext } from "@/src/context/ProgressContext";
 
 interface Props {
   chapterId: number;
@@ -25,6 +17,7 @@ interface Props {
   video_title: string;
   video_url: string;
   mode?: "admin" | "user";
+  targetConceptId?: number | null;
 }
 
 export default function ConceptTab({
@@ -34,6 +27,7 @@ export default function ConceptTab({
   order_index,
   video_title,
   video_url,
+  targetConceptId = null,
   mode = "admin",
 }: Props) {
 
@@ -41,22 +35,14 @@ export default function ConceptTab({
   const [showConcept, toggleShowConcept] = useState(false);
   const [showQuiz, toggleShowQuiz] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
+  const { progress, toggleComplete, markAccessed } = useProgressContext();
 
- useEffect(() => {
-    const userId = getUserId();
-    if (!userId) return;
+const isCompleted = progress[conceptId]?.completed??false;
+const ref = useRef<HTMLDivElement>(null);
 
-    function load() {
-        const progress = getProgressForUser(userId!);
-        setIsCompleted(!!progress[conceptId]?.completed);
-    }
-
-    load();
-    window.addEventListener("storage", load);
-
-    return () => window.removeEventListener("storage", load);
-}, [conceptId, showQuiz]);
+function handleToggle() {
+  toggleComplete(conceptId, !isCompleted);
+}
 
   function getYoutubeId(url: string) {
     try {
@@ -69,24 +55,29 @@ export default function ConceptTab({
     }
   }
 
-  function handleToggle() {
-        const userId = getUserId();
-        if (!userId) return;
-
-        if (isCompleted) {
-            unmarkConceptCompleted(userId, conceptId);
-            setIsCompleted(false);
-        } else {
-            markConceptCompleted(userId, conceptId, 0);
-            setIsCompleted(true);
-        }
-    }
+  useEffect(() => {
+  if (targetConceptId === conceptId) {
+    ref.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }
+}, [targetConceptId, conceptId]);
 
   const videoId = getYoutubeId(video_url);
   const thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
   return (
     <>
+        <input
+      type="checkbox"
+      checked={isCompleted}
+      disabled={!progress[conceptId]}
+      onChange={(e) => {
+        e.stopPropagation();
+        handleToggle();
+      }}
+    />
       {showVideo && (
         <div
           style={{
@@ -135,7 +126,7 @@ export default function ConceptTab({
         <QuizAttemptPanel conceptId={conceptId} conceptName={conceptName} onClose={() => toggleShowQuiz(false)} />
       )}
 
-      <div
+      <div ref={ref}
         className="group mb-4 rounded-3xl border border-white/10 bg-white/5 p-3 shadow-sm transition hover:-translate-y-1 hover:border-[#ff6b00] hover:bg-white/10"
         onClick={() => {
           if (mode === "admin") toggleShowConcept(true);
@@ -143,17 +134,7 @@ export default function ConceptTab({
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {mode === "user" && (
-              <>
-                <input
-                  type="checkbox"
-                  checked={isCompleted}
-                  onChange={handleToggle}
-                  className="accent-yellow w-4 h-4 cursor-pointer"
-                />
-                <ProgressBadge completed={isCompleted} />
-              </>
-            )}
+            
             <div className="flex flex-col">
               <p className="text-lg font-semibold text-white" style={{ fontFamily: 'Arial, Helvetica, sans-serif', letterSpacing: '0.5px', lineHeight: '1.3' }}>
                 {conceptName}
@@ -173,12 +154,7 @@ export default function ConceptTab({
                   className="h-16 w-24 rounded-xl object-cover shadow-sm transition group-hover:scale-105"
                   onClick={(e) => {
                       e.stopPropagation();
-
-                      const userId = getUserId();
-                      if (userId) {
-                          markConceptAccessed(userId, conceptId); 
-                      }
-
+                      markAccessed(conceptId);
                       setShowVideo(true);
                   }}
                 />

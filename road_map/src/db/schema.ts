@@ -1,6 +1,7 @@
 //@src/db/schema.ts
 import { pgEnum, pgTable, serial, varchar, text, integer, char, timestamp } from "drizzle-orm/pg-core";
 import { boolean, date } from "drizzle-orm/pg-core";
+import { uniqueIndex } from "drizzle-orm/pg-core";
 
 export const subjectEnum=pgEnum("subject_enum",["PHYSICS","CHEMISTRY","MATHS",]);
 
@@ -83,3 +84,31 @@ export const users = pgTable("users", {
 
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const userProgress = pgTable(
+  "user_progress",
+  {
+    id: serial("id").primaryKey(),
+
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+
+    conceptId: integer("concept_id")
+      .notNull()
+      .references(() => concept.id, { onDelete: "cascade" }),
+
+    completed: boolean("completed").default(false),
+
+    score: integer("score"),
+
+    lastAccessedAt: timestamp("last_accessed_at"),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    uniqueUserConcept: uniqueIndex("user_concept_unique").on(
+      table.userId,
+      table.conceptId
+    ),
+  })
+);

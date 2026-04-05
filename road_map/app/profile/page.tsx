@@ -2,8 +2,10 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function ProfilePage() {
+  const { update } = useSession();
   const [form, setForm] = useState({
     name: "",
     dob: "",
@@ -18,6 +20,7 @@ export default function ProfilePage() {
   }
 
   async function handleSubmit() {
+    
     const res = await fetch("/api/user/profile", {
       method: "POST",
       headers: {
@@ -27,7 +30,8 @@ export default function ProfilePage() {
     });
 
     if (res.ok) {
-      window.location.href = "/learn"; // redirect after saving
+      await update();
+      window.location.href = "/learn";
     } else {
       alert("Failed to save profile");
     }

@@ -7,7 +7,7 @@ export default async function LearnRouter() {
   const session = await getServerSession(authOptions);
 
   if (!session) redirect("/login");
-console.log("User role:", session.user?.role);
+  // console.log("User role:", session.user?.role);
   if (session.user?.role === "admin") {
     redirect("/admin");
   }

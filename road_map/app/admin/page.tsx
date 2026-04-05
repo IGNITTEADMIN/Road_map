@@ -1,3 +1,4 @@
+//./app/admin/page.tsx
 // Server Component — no "use client"
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";

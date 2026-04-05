@@ -7,8 +7,7 @@ import { mapRowToQuestion } from "./mappers";
 import QuestionView from "./QuestionView";
 import ProgressBar from "./ProgressBar";
 import QuestionList from "./QuestionList";
-import { markConceptCompleted, getUserId } from "@/src/utils/progress";
-
+import { useProgressContext } from "@/src/context/ProgressContext";
 import Button from "@/app/components/ui/Button";
 
 interface Props {
@@ -17,7 +16,7 @@ interface Props {
   onClose: () => void;
 }
 
-export default function QuizAttemptPanel({
+export default async function QuizAttemptPanel({
   conceptId,
   conceptName,
   onClose,
@@ -28,6 +27,7 @@ export default function QuizAttemptPanel({
   const [answers, setAnswers] = useState<Record<number, number | null>>({});
   const [timeLeft, setTimeLeft] = useState(120);
   const [quizFinished, setQuizFinished] = useState(false);
+  
 
   function calculateScore() {
     let score = 0;
@@ -50,15 +50,6 @@ export default function QuizAttemptPanel({
     loadQuiz();
   }, [conceptId]);
   
-  useEffect(() => {
-  if (quizFinished) {
-    const userId = getUserId();
-    if (!userId) return;
-
-    const score = calculateScore();
-    markConceptCompleted(userId, conceptId, score);
-  }
-}, [quizFinished, conceptId]);
 
   useEffect(() => {
   if (quizFinished) return;
@@ -101,7 +92,9 @@ export default function QuizAttemptPanel({
 
   if (quizFinished) {
     const score = calculateScore();
+    const { attemptQuiz } = useProgressContext();
 
+await attemptQuiz(conceptId, score);
     return (
       <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 p-4">
         <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg backdrop-blur">

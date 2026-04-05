@@ -1,3 +1,4 @@
+//./api/user/profile/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/src/db/client";
 import { users } from "@/src/db/schema";
@@ -7,6 +8,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(req: NextRequest) {
   try {
+    console.log("555555555555555555555555555555555555555555555][]]]]]]]]]]]]]]]]]");
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {

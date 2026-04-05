@@ -4,15 +4,12 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import SubjectCardGrid from "@/app/components/SubjectCardGrid";
-import ProgressCard from "@/app/components/ProgressCard";
 import ChapterList from "@/app/components/ChapterList";
 import ClusterList from "@/app/components/ClusterList";
 import { ChapterRow, ContentRow } from "@/src/types/content";
-import {
-  getSubjectProgress,
-  getProgressForUser,
-  getUserId,
-} from "@/src/utils/progress";
+import { useSearchParams } from "next/navigation";
+
+
 import Loader from "@/app/components/ui/Loader";
 
 export default function UserPage() {
@@ -20,25 +17,35 @@ export default function UserPage() {
   const [loading, setLoading] = useState(false);
   const [chapterRows, setChapterRows] = useState<ChapterRow[]>([]);
   const [conceptsByChapter, setConceptsByChapter] = useState<Record<number, ContentRow[]>>({});
-  const [progress, setProgress] = useState<Record<number, any>>({});
   const [viewMode, setViewMode] = useState<"chapter" | "cluster">("chapter");
-  
+  const searchParams = useSearchParams();
+  const [targetConceptId, setTargetConceptId] = useState<number | null>(null);
+const [targetChapterId, setTargetChapterId] = useState<number | null>(null);
+const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
+
+    const subjectParam = searchParams.get("subject");
+    const chapterParam = searchParams.get("chapterId");
+    const conceptParam = searchParams.get("conceptId");
+    useEffect(() => {
+  if (!subjectParam) return;
+
+  setSelectedSubject(subjectParam);
+
+  setTimeout(() => {
+    if (chapterParam) {
+      setExpandedChapterId(Number(chapterParam));
+    }
+
+    if (conceptParam) {
+      setTargetConceptId(Number(conceptParam));
+    }
+  }, 100);
+}, [subjectParam, chapterParam, conceptParam]);
 
   const { data: session, status } = useSession();
 
 
-  useEffect(() => {
-    const userId = getUserId();
-    if (!userId) return;
-
-    const load = () => {
-      setProgress(getProgressForUser(userId));
-    };
-
-    load();
-    window.addEventListener("storage", load);
-    return () => window.removeEventListener("storage", load);
-  }, []);
+  
 
   // Fetch
   useEffect(() => {
@@ -72,9 +79,7 @@ export default function UserPage() {
   }, [selectedSubject]);
   
 
-  const subjectProgress = selectedSubject
-    ? getSubjectProgress(chapterRows, conceptsByChapter, progress)
-    : 0;
+  
 
   // ✅ Grouping
   function groupByCluster(chapters: ChapterRow[]) {
@@ -118,15 +123,6 @@ export default function UserPage() {
         </div>
       </section>
 
-      {/* PROGRESS */}
-      {selectedSubject && (
-        <section className="py-16">
-          <div className="mx-auto max-w-6xl px-6">
-            <ProgressCard progress={subjectProgress} />
-          </div>
-        </section>
-      )}
-
       {/* CONTENT */}
       {selectedSubject && (
         <section className="py-16">
@@ -169,14 +165,21 @@ export default function UserPage() {
               <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
                 {viewMode === "chapter" ? (
                   <ChapterList
-                    subject={selectedSubject}
-                    rows={chapterRows}
-                    mode="user"
-                  />
+                      subject={selectedSubject}
+                      rows={chapterRows}
+                      mode="user"
+                      initialChapterId={chapterParam ? Number(chapterParam) : null}
+                      targetConceptId={conceptParam ? Number(conceptParam) : null}
+                      targetChapterId={chapterParam ? Number(chapterParam) : null}
+                      expandedChapterId={expandedChapterId}
+                      setExpandedChapterId={setExpandedChapterId}
+                    />
                 ) : (
                   <ClusterList
                     groupedChapters={groupedChapters}
                     subject={selectedSubject}
+                    targetConceptId={targetConceptId}
+                    targetChapterId={targetChapterId}
                   />
                 )}
               </div>

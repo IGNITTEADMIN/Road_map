@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import ProfileDropdown from "./ProfileDropdown";
-import ResetProgress from "@/app/components/ResetProgress";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -66,9 +65,6 @@ export default function Navbar() {
               Login
             </Link>
           )}
-
-          {/* Reset Progress */}
-          <ResetProgress />
 
           {/* Profile */}
           {session && <ProfileDropdown />}
