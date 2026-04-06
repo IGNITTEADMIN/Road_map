@@ -16,7 +16,7 @@ interface Props {
   onClose: () => void;
 }
 
-export default async function QuizAttemptPanel({
+export default function QuizAttemptPanel({
   conceptId,
   conceptName,
   onClose,
@@ -27,6 +27,8 @@ export default async function QuizAttemptPanel({
   const [answers, setAnswers] = useState<Record<number, number | null>>({});
   const [timeLeft, setTimeLeft] = useState(120);
   const [quizFinished, setQuizFinished] = useState(false);
+  const { attemptQuiz } = useProgressContext();
+
   
 
   function calculateScore() {
@@ -67,6 +69,14 @@ export default async function QuizAttemptPanel({
   return () => clearInterval(timer);
 }, [quizFinished]);
 
+useEffect(() => {
+  if (!quizFinished) return;
+
+  const score = calculateScore();
+
+  attemptQuiz(conceptId, score);
+}, [quizFinished]);
+
   function handleSelect(optionIndex: number) {
     setSelectedOption(optionIndex);
 
@@ -92,9 +102,7 @@ export default async function QuizAttemptPanel({
 
   if (quizFinished) {
     const score = calculateScore();
-    const { attemptQuiz } = useProgressContext();
 
-await attemptQuiz(conceptId, score);
     return (
       <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 p-4">
         <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg backdrop-blur">
@@ -127,7 +135,6 @@ await attemptQuiz(conceptId, score);
               answers={answers}
               onJump={(i) => setCurrent(i)}
             />
-            {/*<QuizTimer timeLeft={timeLeft} />*/}
           </div>
 
           {/* RIGHT SIDE */}
