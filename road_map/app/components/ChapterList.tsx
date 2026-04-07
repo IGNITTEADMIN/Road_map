@@ -78,7 +78,6 @@ export default function ChapterList({ subject, rows, mode="admin",initialChapter
                         chapterId={row.chapterId}
                         chapterName={row.chapterName}
                         onClick={() => handleClick(row.chapterId)}
-                        conceptList={conceptList}
                         expandedcI={expandedChapterId}
                         mode={mode}
                         />

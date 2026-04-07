@@ -13,7 +13,8 @@ export default function AdminPage(){
     const [selectedSubject, setSelectedSubject]= useState< Subject | null>(null);
     const [loading,setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [chapterRows, setChapterRows]=useState<ChapterRow[]>([])
+    const [chapterRows, setChapterRows]=useState<ChapterRow[]>([]);
+    const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
     
     
     useEffect(()=>{
@@ -58,10 +59,12 @@ export default function AdminPage(){
                 </div>
             ) : (
                 <ChapterList
-                subject={selectedSubject}
-                rows={chapterRows}
-                mode="admin"
-                />
+                    subject={selectedSubject}
+                    rows={chapterRows}
+                    mode="admin"
+                    expandedChapterId={expandedChapterId}
+                    setExpandedChapterId={setExpandedChapterId}
+                    />
             )
             )}
         </div>

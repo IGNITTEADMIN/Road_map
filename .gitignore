@@ -29,3 +29,6 @@ yarn-error.log*
 
 # Vercel / deployment folders
 .vercel
+
+# Local Netlify folder
+.netlify

@@ -5,9 +5,9 @@ import {editConcept} from "@/src/db/queries";
 import {renameChapter} from "@/src/db/queries";
 import { requireAdmin } from "@/src/lib/apiAuth";
 
-export async function DELETE(_req: Request, { params }: { params: { chapterId: string } }) {
+export async function DELETE(_req: Request,  context: { params: Promise<{ chapterId: string }> }) {
   try {
-    const { chapterId } = params;
+    const { chapterId } = await context.params;
 
     await deleteChapter(Number(chapterId));
 
