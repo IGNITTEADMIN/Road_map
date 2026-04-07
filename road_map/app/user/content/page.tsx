@@ -125,44 +125,44 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
 
       {/* CONTENT */}
       {selectedSubject && (
-        <section className="py-16">
-          <div className="mx-auto max-w-6xl px-6">
+        <section className="py-20">
+          <div className="mx-auto max-w-7xl px-6">
 
             {/* TOGGLE */}
-            <div className="flex gap-3 mb-4">
+            <div className="flex gap-2 mb-8 justify-center">
               <button
                 onClick={() => setViewMode("chapter")}
-                className={`px-4 py-2 rounded-xl border ${
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
                   viewMode === "chapter"
-                    ? "bg-white text-black"
-                    : "text-white border-white/20"
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105"
+                    : "text-gray-400 border border-gray-700 hover:border-gray-500 hover:text-gray-200"
                 }`}
               >
-                Chapters
+                📚 Chapters
               </button>
 
               <button
                 onClick={() => setViewMode("cluster")}
-                className={`px-4 py-2 rounded-xl border ${
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
                   viewMode === "cluster"
-                    ? "bg-white text-black"
-                    : "text-white border-white/20"
+                    ? "bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg transform scale-105"
+                    : "text-gray-400 border border-gray-700 hover:border-gray-500 hover:text-gray-200"
                 }`}
               >
-                Clusters
+                🔗 Clusters
               </button>
             </div>
 
-            <h2 className="text-2xl font-semibold mb-3">
-              {viewMode === "chapter" ? "Chapters" : "Clusters"}
+            <h2 className="text-3xl font-bold mb-6 text-center text-white">
+              {viewMode === "chapter" ? "Explore Chapters" : "Discover Clusters"}
             </h2>
 
             {loading ? (
-              <div className="py-10 flex justify-center">
+              <div className="py-20 flex justify-center">
                 <Loader show={loading} />
               </div>
             ) : (
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+              <div className="rounded-3xl border border-gray-700 bg-gradient-to-br from-black to-gray-900 p-8 shadow-2xl backdrop-blur-sm">
                 {viewMode === "chapter" ? (
                   <ChapterList
                       subject={selectedSubject}

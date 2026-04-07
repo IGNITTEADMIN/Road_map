@@ -35,14 +35,32 @@ export default function ConceptTab({
   const [showConcept, toggleShowConcept] = useState(false);
   const [showQuiz, toggleShowQuiz] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
-  const { progress, toggleComplete, markAccessed } = useProgressContext();
+  
 
-const isCompleted = progress[conceptId]?.completed??false;
-const ref = useRef<HTMLDivElement>(null);
+  const ctx = useProgressContext();
 
-function handleToggle() {
-  toggleComplete(conceptId, !isCompleted);
-}
+    const progress = mode === "user" ? ctx?.progress ?? {} : {};
+    const toggleComplete =
+      mode === "user" ? ctx?.toggleComplete ?? (() => {}) : () => {};
+    const markAccessed =
+      mode === "user" ? ctx?.markAccessed ?? (() => {}) : () => {};
+
+    const isCompleted = progress[conceptId]?.completed??false;
+    const [localCompleted, setLocalCompleted] = useState(isCompleted);
+    useEffect(() => {
+      setLocalCompleted(isCompleted);
+    }, [isCompleted]);
+    const ref = useRef<HTMLDivElement>(null);
+
+    function handleToggle() {
+      const newValue = !localCompleted;
+
+      // ✅ instant UI update
+      setLocalCompleted(newValue);
+
+      // ✅ background update
+      toggleComplete(conceptId, newValue);
+    }
 
   function getYoutubeId(url: string) {
     try {
@@ -58,9 +76,9 @@ function handleToggle() {
   useEffect(() => {
   if (targetConceptId === conceptId) {
     ref.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
+    behavior: "smooth",
+    block: "nearest",
+  });
   }
 }, [targetConceptId, conceptId]);
 
@@ -69,15 +87,7 @@ function handleToggle() {
 
   return (
     <>
-        <input
-      type="checkbox"
-      checked={isCompleted}
-      disabled={!progress[conceptId]}
-      onChange={(e) => {
-        e.stopPropagation();
-        handleToggle();
-      }}
-    />
+        
       {showVideo && (
         <div
           style={{
@@ -127,21 +137,30 @@ function handleToggle() {
       )}
 
       <div ref={ref}
-        className="group mb-4 rounded-3xl border border-white/10 bg-white/5 p-3 shadow-sm transition hover:-translate-y-1 hover:border-[#ff6b00] hover:bg-white/10"
+        className="group mb-3 rounded-3xl border border-white/10 bg-white/5 p-3 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:border-[#ff6b00] hover:bg-white/10 hover:shadow-2xl backdrop-blur-sm"
         onClick={() => {
           if (mode === "admin") toggleShowConcept(true);
         }}
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={isCompleted}
+              disabled={!progress[conceptId]}
+              onChange={(e) => {
+                e.stopPropagation();
+                handleToggle();
+              }}
+              className={`w-5 h-5 ${isCompleted ? 'text-green-500' : 'text-orange-500'} bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2`}
+            />
             <div className="flex flex-col">
-              <p className="text-lg font-semibold text-white" style={{ fontFamily: 'Arial, Helvetica, sans-serif', letterSpacing: '0.5px', lineHeight: '1.3' }}>
-                {conceptName}
-              </p>
-              <p className="text-sm text-white/60">
-                {mode === "admin" ? "Manage concept details" : "View concept details and take quiz"}
-              </p>
+              <p
+                  className="text-base font-semibold text-white leading-tight"
+                  style={{ fontFamily: "Inter, sans-serif", letterSpacing: "0.3px" }}
+                >
+                  {conceptName}
+                </p>
             </div>
           </div>
           {mode === "user" && (

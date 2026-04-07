@@ -12,16 +12,28 @@ export default function Navbar() {
   const isAdmin = session?.user?.role === "admin";
 
   // Common button style
-  const buttonClass = "nav-button text-sm font-medium px-5 py-2";
+  const buttonClass = "nav-button text-sm font-medium px-5 py-2 rounded-lg hover:bg-white/10 transition-colors duration-200 text-white";
 
   return (
-    <nav className="sticky top-0 z-50 bg-black/90 backdrop-blur-md border-b border-white/10 px-6 py-3">
-      <div className="mx-auto max-w-6xl flex items-center justify-between">
+    <nav className="sticky top-0 z-50 bg-gradient-to-r from-[#0b0f1a] via-[#0f172a] to-[#111827] backdrop-blur-md border-b border-blue-500/10 px-6 py-1 shadow-lg">
+      <div className="w-full flex items-center justify-between">
         
-        {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-white tracking-tight">
-          LearnPlatform
-        </Link>
+        <div className="flex items-center gap-3">
+  <img src="/Logo_IGNITTE.png" alt="Ignitte Logo" className="h-16 w-16" />
+
+  <div className="flex flex-col">
+    <Link
+      href="/"
+      className="text-2xl font-bold text-white tracking-tight hover:text-white-300 transition-colors"
+    >
+      Roadmap
+    </Link>
+
+    <p className="text-xs text-gray-300">
+      Structured JEE Prep Platform
+    </p>
+  </div>
+</div>
 
         {/* Links & Actions */}
         <div className="flex items-center gap-4">

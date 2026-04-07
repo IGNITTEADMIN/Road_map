@@ -1,4 +1,3 @@
-//./app/components/quiz/QuestionList.tsx
 "use client";
 
 import { Question } from "./types";
@@ -17,62 +16,62 @@ export default function QuestionList({
   onJump,
 }: Props) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-      <h3 className="font-semibold mb-4 text-white">Quiz Questions</h3>
+    <div className="rounded-xl border border-white/10 bg-white/5 p-4 w-full">
+  <h3 className="font-medium mb-4 text-white text-sm">
+    Quiz Questions
+  </h3>
 
-      <div className="space-y-2">
-        {questions.map((_, i) => {
-          const answered = answers[i] !== undefined;
-          const isCurrent = i === current;
+  <div className="space-y-2">
+    {questions.map((_, i) => {
+      const answered = answers[i] !== undefined;
+      const isCurrent = i === current;
 
-          const baseStyles =
-            "flex items-center justify-between px-3 py-1.5 rounded-md cursor-pointer transition";
+      const baseStyles =
+        "flex items-center justify-between px-3 py-1.5 rounded-md cursor-pointer transition w-full";
 
-          const bgStyles = isCurrent
-            ? "bg-[#ff6b00]/20 border border-[#ff6b00]/50"
-            : answered
-            ? "bg-white/5 hover:bg-white/10 border border-white/10"
-            : "bg-white/5 hover:bg-white/10 border border-white/10";
+      const bgStyles = isCurrent
+        ? "bg-[#ff6b00]/20 border border-[#ff6b00]/50"
+        : "bg-white/5 hover:bg-white/10 border border-white/10";
 
-          return (
-            <button
-              key={i}
-              type="button"
-              onClick={() => onJump(i)}
-              className={`${baseStyles} ${bgStyles}`}
+      return (
+        <button
+          key={i}
+          type="button"
+          onClick={() => onJump(i)}
+          className={`${baseStyles} ${bgStyles}`}
+        >
+          <span className="flex items-center gap-2">
+            <span
+              className={`h-6 w-6 flex items-center justify-center rounded-full border text-xs font-medium ${
+                isCurrent
+                  ? "border-white/50 bg-[#ff6b00] text-black"
+                  : "border-white/10 bg-white/5 text-white"
+              }`}
             >
-              <span className="flex items-center gap-3">
-                <span
-                  className={`h-7 w-7 flex items-center justify-center rounded-full border text-sm font-semibold ${
-                    isCurrent
-                      ? "border-white/50 bg-[#ff6b00] text-black"
-                      : "border-white/10 bg-white/5 text-white"
-                  }`}
-                >
-                  {i + 1}
-                </span>
+              {i + 1}
+            </span>
 
-                <span className="text-sm font-medium text-white">
-                  Question
-                </span>
-              </span>
+            <span className="text-xs text-white/90">
+              Q{i + 1}
+            </span>
+          </span>
 
-              <span className="flex items-center gap-3">
-                <span
-                  className={`h-2.5 w-2.5 rounded-full ${
-                    answered ? "bg-emerald-400" : "bg-white/30"
-                  }`}
-                />
-                {isCurrent && (
-                  <span className="text-xs font-semibold text-[#ff6b00]">
-                    Current
-                  </span>
-                )}
+          <span className="flex items-center gap-2">
+            <span
+              className={`h-2 w-2 rounded-full ${
+                answered ? "bg-green-400" : "bg-white/30"
+              }`}
+            />
+            {isCurrent && (
+              <span className="text-[10px] font-medium text-[#ff6b00]">
+                Current
               </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
+            )}
+          </span>
+        </button>
+      );
+    })}
+  </div>
+</div>
   );
 }

@@ -125,10 +125,11 @@ useEffect(() => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-        <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-white/5 p-3 shadow-xl backdrop-blur">      
+       <div className="w-full max-w-3xl max-h-[90vh] flex items-start justify-center">
+        <div className="scale-90 origin-top w-full overflow-y-auto rounded-3xl border border-white/10 bg-white/5 p-3 shadow-xl backdrop-blur">      
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
           {/* LEFT SIDEBAR */}
-          <div className="space-y-4">
+          <div className="space-y-4 flex flex-col justify-center">
             <QuestionList
               questions={questions}
               current={current}
@@ -139,8 +140,8 @@ useEffect(() => {
 
           {/* RIGHT SIDE */}
           <div className="lg:col-span-2">
-            <div className="flex flex-col gap-2 mb-4">
-              <h2 className="text-3xl font-semibold text-white">
+            <div className="flex flex-col gap-2 mb-5">
+              <h2 className="text-2xl font-semibold text-white p-2">
                 {conceptName ?? "Quiz"}
               </h2>
               <ProgressBar current={current} total={questions.length} />
@@ -178,7 +179,8 @@ useEffect(() => {
             </div>
           </div>
         </div>
-      </div>
+      
     </div>
+    </div></div>
   );
 }
