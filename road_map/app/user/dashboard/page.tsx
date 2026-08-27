@@ -4,6 +4,7 @@ import { useProgressContext } from "@/src/context/ProgressContext";
 import { useProgressMeta } from "@/src/hooks/useProgressMeta";
 import { computeStats } from "@/src/utils/progressUtils";
 import ContinueLearning from "@/app/components/dashboard/ContinueLearning";
+import Loader from "@/app/components/ui/Loader";
 
 type SubjectStat = {
   completed: number;
@@ -14,9 +15,9 @@ export default function DashboardPage() {
   const { progress, streak, loading: progressLoading } = useProgressContext();
   const { meta, loading: metaLoading } = useProgressMeta();
 
-  if (progressLoading || metaLoading) {
-    return <div>Loading...</div>;
-  }
+if (progressLoading || metaLoading) {
+  return <Loader show={true} />;
+}
 
   if (!meta) {
     return <div>Error loading data</div>;
