@@ -215,16 +215,9 @@ export async function unmarkConceptCompletedDB(
   userId: number,
   conceptId: number
 ) {
-  return await db
-    .update(userProgress)
-    .set({
-      completed: false,
-      updatedAt: new Date(),
-    })
-    .where(
-      and(
-        eq(userProgress.userId, userId),
-        eq(userProgress.conceptId, conceptId)
-      )
-    );
+  return await upsertUserProgress({
+    userId,
+    conceptId,
+    completed: false,
+  });
 }
