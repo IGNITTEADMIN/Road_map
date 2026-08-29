@@ -54,6 +54,7 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
       let isActive = true;
 
       async function fetchData() {
+        setLoading(true);
         try {
           const res = await fetch(`/api/chapters/get?subject=${selectedSubject}`);
           const chapters = await res.json();
@@ -131,11 +132,9 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
 
           <SubjectCardGrid
             selected={selectedSubject}
-            onSelect={async (subject:string) => {
-              setLoading(true);          
+            onSelect={(subject:string) => {
               setChapterRows([]);       
               setConceptsByChapter({});
-              await new Promise((resolve) => setTimeout(resolve, 0)); 
               setSelectedSubject(subject);
             }}
           />

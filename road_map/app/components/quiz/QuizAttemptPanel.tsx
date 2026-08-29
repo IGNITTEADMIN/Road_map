@@ -1,4 +1,3 @@
-//./app/components/quiz/QuizAttemptPanel.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -29,8 +28,6 @@ export default function QuizAttemptPanel({
   const [quizFinished, setQuizFinished] = useState(false);
   const { attemptQuiz } = useProgressContext();
 
-  
-
   function calculateScore() {
     let score = 0;
     questions.forEach((q, index) => {
@@ -51,50 +48,44 @@ export default function QuizAttemptPanel({
 
     loadQuiz();
   }, [conceptId]);
-  
 
   useEffect(() => {
-  if (quizFinished) return;
+    if (quizFinished) return;
 
-  const timer = setInterval(() => {
-    setTimeLeft((prev) => {
-      if (prev <= 1) {
-        setQuizFinished(true);
-        return 0;
-      }
-      return prev - 1;
-    });
-  }, 1000);
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setQuizFinished(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-  return () => clearInterval(timer);
-}, [quizFinished]);
+    return () => clearInterval(timer);
+  }, [quizFinished]);
 
-useEffect(() => {
-  if (!quizFinished) return;
-
-  const score = calculateScore();
-
-  attemptQuiz(conceptId, score);
-}, [quizFinished]);
+  useEffect(() => {
+    if (!quizFinished) return;
+    const score = calculateScore();
+    attemptQuiz(conceptId, score);
+  }, [quizFinished]);
 
   function handleSelect(optionIndex: number) {
     setSelectedOption(optionIndex);
-
     setAnswers((prev) => ({
       ...prev,
       [current]: optionIndex,
     }));
   }
 
-
-
   function nextQuestion() {
-  if (current + 1 < questions.length) {
-    const next = current + 1;
-    setCurrent(next);
-    setSelectedOption(answers[next] ?? null);
+    if (current + 1 < questions.length) {
+      const next = current + 1;
+      setCurrent(next);
+      setSelectedOption(answers[next] ?? null);
+    }
   }
-}
 
   function handleSubmitQuiz() {
     setQuizFinished(true);
@@ -102,60 +93,60 @@ useEffect(() => {
 
   if (quizFinished) {
     const score = calculateScore();
+    const total = questions.length;
+    const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+
+    const tone =
+      percent >= 80
+        ? { ring: "#22c55e", label: "Excellent work! 🔥", chip: "text-green-400" }
+        : percent >= 50
+        ? { ring: "#ff6b00", label: "Good job — keep improving 🚀", chip: "text-orange-400" }
+        : { ring: "#ef4444", label: "Keep practicing, you'll get there 💪", chip: "text-red-400" };
 
     return (
-  <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 p-4">
-    <div className="w-full max-w-md rounded-3xl border border-white/10 bg-gradient-to-br from-[#0f172a] to-[#111827] p-8 shadow-2xl backdrop-blur text-white text-center">
-
-      {/* 🎉 Title */}
-      <h2 className="text-3xl font-bold mb-2">
-        Quiz Completed 🎉
-      </h2>
-
-      <p className="text-gray-300 mb-6">
-        Great job! Here's your performance
-      </p>
-
-      {/* 🔵 Score Circle */}
-      <div className="flex justify-center mb-6">
-        <div className="h-28 w-28 rounded-full border-4 border-orange-500 flex items-center justify-center text-2xl font-bold">
-          {score}/{questions.length}
-        </div>
-      </div>
-
-      {/* 📊 Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
-        <div className="bg-white/5 rounded-xl p-3">
-          <p className="text-gray-400">Correct</p>
-          <p className="text-green-400 font-semibold">{score}</p>
-        </div>
-        <div className="bg-white/5 rounded-xl p-3">
-          <p className="text-gray-400">Wrong</p>
-          <p className="text-red-400 font-semibold">
-            {questions.length - score}
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4">
+        <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#111113] p-8 shadow-2xl text-white text-center">
+          <p className="text-xs font-semibold tracking-widest text-white/40 mb-2">
+            {conceptName?.toUpperCase() ?? "QUIZ"}
           </p>
+          <h2 className="text-2xl font-bold mb-1">Quiz Completed</h2>
+          <p className="text-sm text-white/60 mb-8">Here's how you did</p>
+
+          {/* Score ring */}
+          <div className="flex justify-center mb-8">
+            <div
+              className="h-32 w-32 rounded-full flex items-center justify-center"
+              style={{
+                background: `conic-gradient(${tone.ring} ${percent}%, rgba(255,255,255,0.08) ${percent}%)`,
+              }}
+            >
+              <div className="h-24 w-24 rounded-full bg-[#111113] flex flex-col items-center justify-center">
+                <span className="text-2xl font-bold">{score}/{total}</span>
+                <span className="text-xs text-white/50">{percent}%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-xs text-white/50 mb-1">Correct</p>
+              <p className="text-xl font-semibold text-green-400">{score}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-xs text-white/50 mb-1">Wrong</p>
+              <p className="text-xl font-semibold text-red-400">{total - score}</p>
+            </div>
+          </div>
+
+          <p className={`mb-8 text-sm font-medium ${tone.chip}`}>{tone.label}</p>
+
+          <Button onClick={onClose} variant="action">
+            Close
+          </Button>
         </div>
       </div>
-
-      {/* 🏁 Performance Message */}
-      <p className="mb-6 text-sm text-gray-300">
-        {score === questions.length
-          ? "Perfect score! 🔥"
-          : score > questions.length / 2
-          ? "Good job! Keep improving 🚀"
-          : "Keep practicing, you’ll get better 💪"}
-      </p>
-
-      {/* 🔘 Actions */}
-      <div className="flex justify-center gap-4">
-        <Button onClick={onClose}>
-          Close
-        </Button>
-      </div>
-
-    </div>
-  </div>
-);
+    );
   }
 
   const q = questions[current];
@@ -163,15 +154,18 @@ useEffect(() => {
 
   return (
     <div className="fixed inset-4 z-50 flex items-center justify-center bg-black/70">
-        <div className="scale-90 origin-center w-full overflow-y-auto rounded-3xl border border-white/10 bg-white/5 p-3 shadow-xl backdrop-blur">      
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+      <div className="w-full h-full max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-[#111113] p-5 shadow-2xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* LEFT SIDEBAR */}
           <div className="space-y-4 flex flex-col justify-center">
             <QuestionList
               questions={questions}
               current={current}
               answers={answers}
-              onJump={(i) => setCurrent(i)}
+              onJump={(i) => {
+                setCurrent(i);
+                setSelectedOption(answers[i] ?? null); // fixes the answer-restore bug
+              }}
             />
           </div>
 
@@ -192,32 +186,20 @@ useEffect(() => {
               onSelect={handleSelect}
             />
 
-            <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="mt-4 flex justify-between">
-                  <Button
-                    onClick={nextQuestion}
-                    disabled={selectedOption === null || current === questions.length - 1}
-                  >
-                    Next Question
-                  </Button>
-
-                  {current === questions.length - 1 && (
-                    <Button
-                      onClick={handleSubmitQuiz}
-                      disabled={selectedOption === null}
-                    >
-                      Submit Quiz
-                    </Button>
-                  )}
-                </div>
-                
-
-              
-            </div>
+            <div className="mt-4 flex justify-between">
+  {current === questions.length - 1 ? (
+    <Button onClick={handleSubmitQuiz} disabled={selectedOption === null}>
+      Submit Quiz
+    </Button>
+  ) : (
+    <Button onClick={nextQuestion} disabled={selectedOption === null}>
+      Next Question
+    </Button>
+  )}
+</div>
           </div>
         </div>
-      
-    </div>
+      </div>
     </div>
   );
 }

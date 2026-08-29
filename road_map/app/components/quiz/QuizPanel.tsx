@@ -115,7 +115,7 @@ export default function QuizPanel({
 
   return (
     <div className="fixed inset-4 z-50 flex items-center justify-center bg-black/70">
-      <div className="w-full h-full max-w-6xl rounded-3xl border border-white/10 bg-white/5 p-8 shadow-xl backdrop-blur overflow-hidden">
+      <div className="w-full h-full max-w-6xl rounded-3xl border border-white/10 bg-[#111113] p-8 shadow-xl overflow-hidden">
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-semibold text-white">Quiz for {conceptName ?? `#${conceptId}`}</h2>

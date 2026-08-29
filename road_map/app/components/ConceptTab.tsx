@@ -145,15 +145,17 @@ export default function ConceptTab({
 >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <input
-  type="checkbox"
-  checked={localCompleted}
-  onChange={(e) => {
-    e.stopPropagation();
-    handleToggle();
-  }}
-  className={`w-5 h-5 ${localCompleted ? 'text-green-500' : 'text-orange-500'} bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2`}
-/>
+            {mode === "user" && (
+    <input
+      type="checkbox"
+      checked={localCompleted}
+      onChange={(e) => {
+        e.stopPropagation();
+        handleToggle();
+      }}
+      className={`w-5 h-5 ${localCompleted ? 'text-green-500' : 'text-orange-500'} bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2`}
+    />
+  )}
             <div className="flex flex-col">
               <p
                   className="text-base font-semibold text-white leading-tight"
@@ -189,10 +191,7 @@ export default function ConceptTab({
               </Button>
             </div>
           )}
-        </div>
-
-        {mode === "admin" && (
-          <div className="mt-4 flex flex-wrap gap-3">
+          {mode === "admin" && (
             <Button
               variant="action"
               onClick={(e) => {
@@ -202,8 +201,8 @@ export default function ConceptTab({
             >
               Add Quiz
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );
