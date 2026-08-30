@@ -14,16 +14,26 @@ interface Props {
   subject: Subject;
   rows: ChapterRow[];
   mode?: "admin" | "user";
+  track?: "JEE" | "BRIDGE"; // 🆕
   initialChapterId?: number | null;
   targetConceptId?: number | null;
-    targetChapterId?: number | null;
-    expandedChapterId:number | null;
-    setExpandedChapterId: (id: number | null) => void;
-  
+  targetChapterId?: number | null;
+  expandedChapterId: number | null;
+  setExpandedChapterId: (id: number | null) => void;
 }
 
 
-export default function ChapterList({ subject, rows, mode="admin",initialChapterId=null,targetConceptId=null,targetChapterId=null,expandedChapterId,setExpandedChapterId     }: Props){
+export default function ChapterList({
+  subject,
+  rows,
+  mode = "admin",
+  track = "JEE", 
+  initialChapterId = null,
+  targetConceptId = null,
+  targetChapterId = null,
+  expandedChapterId,
+  setExpandedChapterId,
+}: Props) {
     
     const [showAddDialog, setShowAddDialog] = useState(false);
     const [conceptList,changeConcepts]=useState<ContentRow[] | []>([]);
@@ -70,7 +80,7 @@ export default function ChapterList({ subject, rows, mode="admin",initialChapter
     return (
         <div className="space-y-4">
             {
-                mode === "admin" && showAddDialog && (<AddChapterDialog subject={subject} onClose={()=>setShowAddDialog(false)} />)
+                mode === "admin" && showAddDialog && (<AddChapterDialog subject={subject} track={track} onClose={()=>setShowAddDialog(false)} />)
             }
             {rows.map((row)=>(
                 <div key={row.chapterId}>

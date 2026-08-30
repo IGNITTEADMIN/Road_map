@@ -16,6 +16,7 @@ interface Props {
   order_index: number;
   video_title: string;
   video_url: string;
+  hasQuiz?: boolean;
   mode?: "admin" | "user";
   targetConceptId?: number | null;
 }
@@ -27,6 +28,7 @@ export default function ConceptTab({
   order_index,
   video_title,
   video_url,
+  hasQuiz = false,
   targetConceptId = null,
   mode = "admin",
 }: Props) {
@@ -180,15 +182,17 @@ export default function ConceptTab({
                   }}
                 />
               )}
-              <Button
-                variant="action"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleShowQuiz(true);
-                }}
-              >
-                Take Quiz
-              </Button>
+              {hasQuiz && ( // 🆕 only render if the concept actually has questions
+                <Button
+                  variant="action"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleShowQuiz(true);
+                  }}
+                >
+                  Take Quiz
+                </Button>
+              )}
             </div>
           )}
           {mode === "admin" && (

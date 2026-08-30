@@ -7,6 +7,7 @@ export interface ContentRow {
   orderIndex: number;
   videoTitle: string;
   videoUrl: string;
+  hasQuiz: boolean; 
 }
 
 export interface ChapterRow {

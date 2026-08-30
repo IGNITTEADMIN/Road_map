@@ -34,20 +34,18 @@ export default function ConceptList({
       )}
 
       {rows.map((row) => (
-        <div key={row.id} className="relative">
-          {/* horizontal branch connecting the trunk line to this row */}
-          <span className="absolute -left-6 top-6 w-6 h-px bg-white/10" />
-          <ConceptTab
-            conceptId={row.id}
-            chapterId={chapterId}
-            conceptName={row.conceptName}
-            order_index={row.orderIndex}
-            video_title={row.videoTitle}
-            video_url={row.videoUrl}
-            mode={mode}
-            targetConceptId={targetConceptId}
-          />
-        </div>
+        <ConceptTab
+          key={row.id}
+          conceptId={row.id}
+          chapterId={chapterId}
+          conceptName={row.conceptName}
+          order_index={row.orderIndex}
+          video_title={row.videoTitle}
+          video_url={row.videoUrl}
+          hasQuiz={row.hasQuiz} // 🆕
+          mode={mode}
+          targetConceptId={targetConceptId}
+        />
       ))}
 
       {mode === "admin" && (

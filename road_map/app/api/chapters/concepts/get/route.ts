@@ -14,8 +14,8 @@ export async function GET(req:Request) {
                 { status: 400 }
             );
         }else{
-            const result=await getConceptsByChapter(Number(chapterId));
-        return NextResponse.json(result,{ status:201});
+            const result = await getConceptsByChapter(Number(chapterId));
+            return NextResponse.json(result, { status: 201 });
         }
     }catch(err:any) {
         return NextResponse.json({error:err.message},{status:500});

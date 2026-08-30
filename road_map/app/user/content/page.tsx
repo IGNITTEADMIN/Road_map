@@ -8,15 +8,16 @@ import ChapterList from "@/app/components/ChapterList";
 import ClusterList from "@/app/components/ClusterList";
 import { ChapterRow, ContentRow } from "@/src/types/content";
 import { useSearchParams } from "next/navigation";
-
+import { Subject } from "@/app/components/SubjectTab";
 
 import Loader from "@/app/components/ui/Loader";
+type Track = "JEE" | "BRIDGE";
 
 export default function UserPage() {
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [track, setTrack] = useState<Track>("JEE");
+  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [loading, setLoading] = useState(false);
   const [chapterRows, setChapterRows] = useState<ChapterRow[]>([]);
-  const [conceptsByChapter, setConceptsByChapter] = useState<Record<number, ContentRow[]>>({});
   const [viewMode, setViewMode] = useState<"chapter" | "cluster">("chapter");
   const searchParams = useSearchParams();
   const [targetConceptId, setTargetConceptId] = useState<number | null>(null);
@@ -26,29 +27,30 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
     const subjectParam = searchParams.get("subject");
     const chapterParam = searchParams.get("chapterId");
     const conceptParam = searchParams.get("conceptId");
+    const trackParam = searchParams.get("track");
     useEffect(() => {
-  if (!subjectParam) return;
+        if (!subjectParam) return;
 
-  setSelectedSubject(subjectParam);
+        setSelectedSubject(subjectParam as Subject);
+        if (trackParam === "BRIDGE") setTrack("BRIDGE");
 
-  setTimeout(() => {
-    if (chapterParam) {
-      setExpandedChapterId(Number(chapterParam));
-    }
+        setTimeout(() => {
+          if (chapterParam) {
+            setExpandedChapterId(Number(chapterParam));
+          }
 
-    if (conceptParam) {
-      setTargetConceptId(Number(conceptParam));
-    }
-  }, 100);
-}, [subjectParam, chapterParam, conceptParam]);
+          if (conceptParam) {
+            setTargetConceptId(Number(conceptParam));
+          }
+        }, 100);
+    }, [subjectParam, chapterParam, conceptParam, trackParam]);
 
   const { data: session, status } = useSession();
 
 
   
 
-  // Fetch
-  useEffect(() => {
+useEffect(() => {
       if (!selectedSubject) return;
 
       let isActive = true;
@@ -56,32 +58,16 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
       async function fetchData() {
         setLoading(true);
         try {
-          const res = await fetch(`/api/chapters/get?subject=${selectedSubject}`);
+          const res = await fetch(`/api/chapters/get?subject=${selectedSubject}&track=${track}`);
           const chapters = await res.json();
 
           if (!isActive) return;
           setChapterRows(chapters);
-
-          const promises = chapters.map((c: ChapterRow) =>
-            fetch(`/api/chapters/concepts/get?chapterId=${c.chapterId}`)
-              .then((r) => r.json())
-          );
-
-          const results = await Promise.all(promises);
-
-          if (!isActive) return;
-
-          const map: Record<number, ContentRow[]> = {};
-          chapters.forEach((c: ChapterRow, i: number) => {
-            map[c.chapterId] = results[i];
-          });
-
-          setConceptsByChapter(map);
-
+         
         } catch (err) {
           console.error(err);
         } finally {
-          if (isActive) setLoading(false); // ✅ ALWAYS stop loader
+          if (isActive) setLoading(false);
         }
       }
 
@@ -90,11 +76,8 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
       return () => {
         isActive = false;
       };
-    }, [selectedSubject]);
+    }, [selectedSubject, track]);
   
-
-  
-
   // ✅ Grouping
   function groupByCluster(chapters: ChapterRow[]) {
     const map: Record<string, ChapterRow[]> = {};
@@ -109,6 +92,12 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
   }
 
   const groupedChapters = groupByCluster(chapterRows);
+  function handleTrackChange(next: Track) { // 🆕
+      setTrack(next);
+      setSelectedSubject(null);
+      setChapterRows([]);
+      setViewMode("chapter"); // Bridge has no cluster view, so reset to chapter view
+  }
 
   return (
     <div className="bg-black text-white min-h-screen">
@@ -125,6 +114,48 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
         </div>
       </section>
 
+      <section className="py-10">
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button
+              onClick={() => handleTrackChange("JEE")}
+              className={`rounded-3xl p-6 text-left border transition-all duration-200
+              ${
+                track === "JEE"
+                  ? "border-orange-500/70 bg-orange-500/[0.08]"
+                  : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
+              }`}
+            >
+              <p className="text-xs font-bold tracking-widest text-orange-400 mb-1">
+                MAIN TRACK
+              </p>
+              <h3 className="text-xl font-bold text-white mb-1">JEE Prep</h3>
+              <p className="text-sm text-gray-400">
+                Full syllabus across Physics, Chemistry, and Maths.
+              </p>
+            </button>
+
+            <button
+              onClick={() => handleTrackChange("BRIDGE")}
+              className={`rounded-3xl p-6 text-left border transition-all duration-200
+              ${
+                track === "BRIDGE"
+                  ? "border-orange-500/70 bg-orange-500/[0.08]"
+                  : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
+              }`}
+            >
+              <p className="text-xs font-bold tracking-widest text-orange-400 mb-1">
+                FOUNDATION
+              </p>
+              <h3 className="text-xl font-bold text-white mb-1">Bridge Course</h3>
+              <p className="text-sm text-gray-400">
+                Catch up on the basics before diving into JEE prep.
+              </p>
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* SUBJECTS */}
       <section className="py-16">
         <div className="mx-auto max-w-6xl px-6">
@@ -132,9 +163,8 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
 
           <SubjectCardGrid
             selected={selectedSubject}
-            onSelect={(subject:string) => {
-              setChapterRows([]);       
-              setConceptsByChapter({});
+            onSelect={(subject: Subject) => { // 🆕 was string
+              setChapterRows([]);
               setSelectedSubject(subject);
             }}
           />
@@ -147,32 +177,38 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
           <div className="mx-auto max-w-7xl px-6">
 
             {/* TOGGLE */}
-            <div className="flex gap-2 mb-8 justify-center">
-              <button
-                onClick={() => setViewMode("chapter")}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                  viewMode === "chapter"
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105"
-                    : "text-gray-400 border border-gray-700 hover:border-gray-500 hover:text-gray-200"
-                }`}
-              >
-                📚 Chapters
-              </button>
+            {track === "JEE" && ( // 🆕
+              <div className="flex gap-2 mb-8 justify-center">
+                <button
+                  onClick={() => setViewMode("chapter")}
+                  className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                    viewMode === "chapter"
+                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105"
+                      : "text-gray-400 border border-gray-700 hover:border-gray-500 hover:text-gray-200"
+                  }`}
+                >
+                  📚 Chapters
+                </button>
 
-              <button
-                onClick={() => setViewMode("cluster")}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                  viewMode === "cluster"
-                    ? "bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg transform scale-105"
-                    : "text-gray-400 border border-gray-700 hover:border-gray-500 hover:text-gray-200"
-                }`}
-              >
-                🔗 Clusters
-              </button>
-            </div>
+                <button
+                  onClick={() => setViewMode("cluster")}
+                  className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                    viewMode === "cluster"
+                      ? "bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg transform scale-105"
+                      : "text-gray-400 border border-gray-700 hover:border-gray-500 hover:text-gray-200"
+                  }`}
+                >
+                  🔗 Clusters
+                </button>
+              </div>
+            )}
 
             <h2 className="text-3xl font-bold mb-6 text-center text-white">
-              {viewMode === "chapter" ? "Explore Chapters" : "Discover Clusters"}
+              {track === "BRIDGE" // 🆕
+                ? "Bridge Course Chapters"
+                : viewMode === "chapter"
+                ? "Explore Chapters"
+                : "Discover Clusters"}
             </h2>
 
             {loading ? (
@@ -181,11 +217,12 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
               </div>
             ) : (
               <div className="rounded-3xl border border-gray-700 bg-gradient-to-br from-black to-gray-900 p-8 shadow-2xl backdrop-blur-sm">
-                {viewMode === "chapter" ? (
+                {track === "BRIDGE" || viewMode === "chapter" ? (
                   <ChapterList
                       subject={selectedSubject}
                       rows={chapterRows}
                       mode="user"
+                      track={track}
                       initialChapterId={chapterParam ? Number(chapterParam) : null}
                       targetConceptId={conceptParam ? Number(conceptParam) : null}
                       targetChapterId={chapterParam ? Number(chapterParam) : null}
