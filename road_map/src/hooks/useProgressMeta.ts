@@ -43,7 +43,7 @@ export function useProgressMeta(track: "JEE" | "BRIDGE" = "JEE") { // 🆕 accep
     return () => {
       mounted = false;
     };
-  }, [track]); // 🆕 re-fetch whenever track changes
+  }, [track]); 
 
   return {
     meta,

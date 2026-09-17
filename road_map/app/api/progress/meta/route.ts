@@ -23,7 +23,7 @@ export async function GET(req: Request) {
 
     const concepts = allConcepts.filter((c) => chapterIds.includes(c.chapterId));
 
-    const map: Record
+    const map: Record<
       string,
       Record<number, { order: number; concepts: { id: number; orderIndex: number }[] }>
     > = {

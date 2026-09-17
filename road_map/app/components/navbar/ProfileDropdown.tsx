@@ -7,6 +7,7 @@ import Button from "@/app/components/ui/Button";
 export default function ProfileDropdown() {
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
+  const [imgSrc, setImgSrc] = useState(session?.user?.image || "/default_avatar.png");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   if (!session) return null;
@@ -28,12 +29,13 @@ export default function ProfileDropdown() {
       <button
   type="button"
   onClick={() => setOpen(!open)}
-  className="h-12 w-12 rounded-full overflow-hidden flex items-center justify-center border border-gray-600 hover:border-orange-500 transition focus:ring-2 focus:ring-orange-500 focus:outline-none bg-transparent"
+  className="relative h-12 w-12 rounded-full overflow-hidden  hover:border-orange-500 transition focus:ring-2 focus:ring-orange-500 focus:outline-none bg-transparent p-1"
 >
   <img
-    src="/default_avatar.png"
+    src={imgSrc}
     alt="profile"
-    className="h-full w-full object-cover object-center"
+    onError={() => setImgSrc("/default_avatar.png")}
+    className="h-full w-full object-contain object-center"
   />
 </button>
 
@@ -41,13 +43,16 @@ export default function ProfileDropdown() {
       {open && (
         <div className="absolute right-0 mt-2 w-64 rounded-xl border border-gray-700 bg-[#1a1a1a] p-5 shadow-2xl z-50 animate-fadeIn">
           <div className="flex items-center gap-3 mb-4">
-            <img
-              src={session.user?.image || "/default_avatar.png"}
-              alt="profile"
-              className="h-12 w-12 rounded-full object-cover object-center border border-gray-600"
-            />
+            <div className="h-12 w-12 rounded-full overflow-hidden  p-1">
+              <img
+                src={imgSrc}
+                alt="profile"
+                onError={() => setImgSrc("/default_avatar.png")}
+                className="h-full w-full object-contain object-center"
+              />
+            </div>
             <div>
-              <p className="text-white font-semibold">{session.user?.name}</p>
+              <p className="text-white font-semibold capitalize">{session.user?.name}</p>
               <p className="text-gray-400 text-sm truncate">{session.user?.email}</p>
             </div>
           </div>

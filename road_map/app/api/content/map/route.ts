@@ -1,3 +1,4 @@
+//@/api/content/map/route.ts
 import { NextResponse } from "next/server";
 import { db } from "@/src/db/client";
 import { chapter, concept } from "@/src/db/schema";

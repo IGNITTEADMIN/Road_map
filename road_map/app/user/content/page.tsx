@@ -163,7 +163,8 @@ useEffect(() => {
 
           <SubjectCardGrid
             selected={selectedSubject}
-            onSelect={(subject: Subject) => { // 🆕 was string
+            track={track}
+            onSelect={(subject: Subject) => {
               setChapterRows([]);
               setSelectedSubject(subject);
             }}
@@ -177,29 +178,31 @@ useEffect(() => {
           <div className="mx-auto max-w-7xl px-6">
 
             {/* TOGGLE */}
-            {track === "JEE" && ( // 🆕
-              <div className="flex gap-2 mb-8 justify-center">
-                <button
-                  onClick={() => setViewMode("chapter")}
-                  className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                    viewMode === "chapter"
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105"
-                      : "text-gray-400 border border-gray-700 hover:border-gray-500 hover:text-gray-200"
-                  }`}
-                >
-                  📚 Chapters
-                </button>
+            {track === "JEE" && (
+              <div className="flex justify-center mb-8">
+                <div className="inline-flex items-center gap-1 rounded-full border border-[#232326] bg-[#0f0f11] p-1.5">
+                  <button
+                    onClick={() => setViewMode("chapter")}
+                    className={`px-8 py-3 rounded-full text-base font-semibold transition-all duration-200 ${
+                      viewMode === "chapter"
+                        ? "bg-orange-500 text-black"
+                        : "text-gray-400 hover:text-gray-200"
+                    }`}
+                  >
+                    Chapters
+                  </button>
 
-                <button
-                  onClick={() => setViewMode("cluster")}
-                  className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                    viewMode === "cluster"
-                      ? "bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg transform scale-105"
-                      : "text-gray-400 border border-gray-700 hover:border-gray-500 hover:text-gray-200"
-                  }`}
-                >
-                  🔗 Clusters
-                </button>
+                  <button
+                    onClick={() => setViewMode("cluster")}
+                    className={`px-8 py-3 rounded-full text-base font-semibold transition-all duration-200 ${
+                      viewMode === "cluster"
+                        ? "bg-orange-500 text-black"
+                        : "text-gray-400 hover:text-gray-200"
+                    }`}
+                  >
+                    Clusters
+                  </button>
+                </div>
               </div>
             )}
 
