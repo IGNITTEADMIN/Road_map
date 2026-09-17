@@ -136,24 +136,26 @@ export default function ConceptTab({
         <QuizAttemptPanel conceptId={conceptId} conceptName={conceptName} onClose={() => toggleShowQuiz(false)} />
       )}
 
-      <div ref={ref}
-        className="group mb-3 rounded-3xl border border-white/10 bg-white/5 p-3 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:border-[#ff6b00] hover:bg-white/10 hover:shadow-2xl backdrop-blur-sm"
-        onClick={() => {
-          if (mode === "admin") toggleShowConcept(true);
-        }}
-      >
+      <div
+  ref={ref}
+  className="group rounded-xl border border-white/10 bg-white/[0.03] p-3 transition-colors duration-200 hover:border-orange-500/40 hover:bg-white/[0.05]"
+  onClick={() => {
+    if (mode === "admin") toggleShowConcept(true);
+  }}
+>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={isCompleted}
-              disabled={!progress[conceptId]}
-              onChange={(e) => {
-                e.stopPropagation();
-                handleToggle();
-              }}
-              className={`w-5 h-5 ${isCompleted ? 'text-green-500' : 'text-orange-500'} bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2`}
-            />
+            {mode === "user" && (
+    <input
+      type="checkbox"
+      checked={localCompleted}
+      onChange={(e) => {
+        e.stopPropagation();
+        handleToggle();
+      }}
+      className={`w-5 h-5 ${localCompleted ? 'text-green-500' : 'text-orange-500'} bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2`}
+    />
+  )}
             <div className="flex flex-col">
               <p
                   className="text-base font-semibold text-white leading-tight"
@@ -189,10 +191,7 @@ export default function ConceptTab({
               </Button>
             </div>
           )}
-        </div>
-
-        {mode === "admin" && (
-          <div className="mt-4 flex flex-wrap gap-3">
+          {mode === "admin" && (
             <Button
               variant="action"
               onClick={(e) => {
@@ -202,8 +201,8 @@ export default function ConceptTab({
             >
               Add Quiz
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );

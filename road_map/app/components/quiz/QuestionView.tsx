@@ -1,3 +1,4 @@
+//./app/components/quiz/QuestionView.tsx
 import { Question } from "./types";
 import OptionButton from "./OptionButton";
 import MathRenderer from "@/app/components/MathRenderer";

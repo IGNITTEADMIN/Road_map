@@ -1,5 +1,4 @@
 //./app/components/ChapterTab.tsx
-
 "use client";
 
 import AddConceptDialog from "@/app/components/dialogBoxes/AddConceptDialog";
@@ -11,7 +10,7 @@ interface Props {
   chapterId: number;
   chapterName: string;
   onClick: () => void;
-  expandedcI: number | null; // index of expanded chapter
+  expandedcI: number | null;
   mode?: "admin" | "user";
 }
 
@@ -28,10 +27,7 @@ export default function ChapterTab({
   const isExpanded = expandedcI === chapterId;
 
   async function handleDelete(id: number) {
-    const res = await fetch(`/api/chapters/${id}`, {
-      method: "DELETE",
-    });
-
+    const res = await fetch(`/api/chapters/${id}`, { method: "DELETE" });
     if (!res.ok) throw new Error("Failed to delete chapter");
   }
 
@@ -42,12 +38,10 @@ export default function ChapterTab({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chapterName: name }),
       });
-
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Rename error");
       }
-      console.log("Renamed successfully");
     } catch (err) {
       console.log(err);
     }
@@ -55,51 +49,67 @@ export default function ChapterTab({
 
   return (
     <div
-      className="group mb-4 rounded-3xl border border-white/10 bg-white/5 p-5 shadow-sm transition hover:-translate-y-1 hover:border-[#ff6b00] hover:bg-white/10 cursor-pointer"
+      className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 cursor-pointer
+      border transition-colors duration-200
+      ${
+        isExpanded
+          ? "bg-white/[0.06] border-orange-500/50"
+          : "bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.05]"
+      }`}
       onClick={onClick}
     >
+      <div className="flex items-center gap-3 min-w-0">
+        {/* Chevron */}
+        <svg
+          className={`w-4 h-4 shrink-0 text-white/50 transition-transform duration-200 ${
+            isExpanded ? "rotate-90 text-orange-400" : ""
+          }`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2.5}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
 
-      {/* Chapter Name / Editing */}
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-2">
-          {mode === "admin" && isEditing ? (
-            <input
-              value={name}
-              onChange={(e) => changeName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSave();
-                if (e.key === "Escape") changeIsEditing(false);
-              }}
-              autoFocus
-              className="text-lg font-semibold text-white bg-transparent border-none outline-none"
-            />
-          ) : (
-            <span
-              className="text-lg font-semibold text-white"
-              onClick={(e) => {
-                if (mode === "admin") {
-                  e.stopPropagation();
-                  changeIsEditing(true);
-                }
-              }}
-            >
-              {name}
-            </span>
-          )}
-        </div>
-
-        {mode === "admin" && (
-          <Button
-            variant="action"
+        {mode === "admin" && isEditing ? (
+          <input
+            value={name}
+            onChange={(e) => changeName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSave();
+              if (e.key === "Escape") changeIsEditing(false);
+            }}
+            autoFocus
+            onClick={(e) => e.stopPropagation()}
+            className="text-base font-semibold text-white bg-transparent border-none outline-none min-w-0"
+          />
+        ) : (
+          <span
+            className="text-base font-semibold text-white truncate"
             onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(chapterId);
+              if (mode === "admin") {
+                e.stopPropagation();
+                changeIsEditing(true);
+              }
             }}
           >
-            Delete
-          </Button>
+            {name}
+          </span>
         )}
       </div>
+
+      {mode === "admin" && (
+        <Button
+          variant="action"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete(chapterId);
+          }}
+        >
+          Delete
+        </Button>
+      )}
     </div>
   );
 }

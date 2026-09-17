@@ -233,7 +233,7 @@ body {
 }
 
 .loader-group {
-  animation: slide 2s linear infinite;
+  animation: slide 1s linear infinite;
 }
 
 .loader-group.delay {

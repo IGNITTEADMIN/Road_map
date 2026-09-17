@@ -84,7 +84,10 @@ export default function ChapterList({ subject, rows, mode="admin",initialChapter
                     {expandedChapterId === row.chapterId && (
                         
                         loadingChapterId === row.chapterId ? (
-                            <Loader show={loadingChapterId === row.chapterId} />
+                            <Loader
+                                show={loadingChapterId === row.chapterId}
+                                fullScreen={false}
+                                />
                             ) : (
                             <ConceptList
                                 chapterId={row.chapterId}

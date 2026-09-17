@@ -45,7 +45,6 @@ export default function AdminPage(){
 
     return (
         <div>
-            <h2>Select a Subject</h2>
             <SubjectTab
                 subject={selectedSubject} 
                 onSubjectChange={setSelectedSubject}

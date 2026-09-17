@@ -45,36 +45,26 @@ export function useProgress() {
     fetchProgress();
   }, [fetchProgress]);
 
-  // 🔹 Complete / Uncomplete
-  const toggleComplete = async (conceptId: number, completed: boolean) => {
-    if (isUpdatingRef.current) return;
-    isUpdatingRef.current = true;
+const toggleComplete = async (conceptId: number, completed: boolean) => {
+  const previous = progress[conceptId];
 
-    try {
-      await fetch("/api/progress/complete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ conceptId, completed }),
-      });
+  setProgress((prev) => ({
+    ...prev,
+    [conceptId]: { ...prev[conceptId], conceptId, completed },
+  }));
 
-      // ✅ Optimistic update
-      setProgress((prev) => ({
-        ...prev,
-        [conceptId]: {
-          ...prev[conceptId],
-          conceptId,
-          completed,
-        },
-      }));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      isUpdatingRef.current = false;
-    }
-  };
-
+  try {
+    const res = await fetch("/api/progress/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ conceptId, completed }),
+    });
+    if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+  } catch (err) {
+    console.error(err);
+    setProgress((prev) => ({ ...prev, [conceptId]: previous }));
+  }
+};
   // 🔹 Access (video click)
   const markAccessed = async (conceptId: number) => {
     if (isUpdatingRef.current) return;
