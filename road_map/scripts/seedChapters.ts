@@ -39,7 +39,7 @@ const chapters: {
 
 async function seed() {
   for (const ch of chapters) {
-    await insertChapter(ch.subject, ch.chapterName, ch.clusterTag);
+    await insertChapter(ch.subject, ch.chapterName, "JEE", ch.clusterTag);
     console.log(`Inserted: ${ch.chapterName}`);
   }
   console.log("All Physics chapters seeded!");
