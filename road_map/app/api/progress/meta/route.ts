@@ -2,22 +2,27 @@
 import { NextResponse } from "next/server";
 import { db } from "@/src/db/client";
 import { chapter, concept } from "@/src/db/schema";
+import { eq } from "drizzle-orm";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    // 1. Fetch chapters (ordered)
+    const { searchParams } = new URL(req.url);
+    const track = (searchParams.get("track") as "JEE" | "BRIDGE" | null) ?? "JEE";
+
     const chapters = await db
       .select()
       .from(chapter)
+      .where(eq(chapter.track, track))
       .orderBy(chapter.subject, chapter.order);
 
-    // 2. Fetch concepts (ordered)
-    const concepts = await db
+    const chapterIds = chapters.map((ch) => ch.id);
+    const allConcepts = await db
       .select()
       .from(concept)
       .orderBy(concept.chapterId, concept.orderIndex);
 
-    // 3. Prepare map
+    const concepts = allConcepts.filter((c) => chapterIds.includes(c.chapterId));
+
     const map: Record<
       string,
       Record<number, { order: number; concepts: { id: number; orderIndex: number }[] }>
@@ -27,7 +32,6 @@ export async function GET() {
       MATHS: {},
     };
 
-    // 4. Initialize chapters
     chapters.forEach((ch) => {
       if (!map[ch.subject]) return;
 
@@ -37,7 +41,6 @@ export async function GET() {
       };
     });
 
-    // 5. Fill concepts
     concepts.forEach((c) => {
       const ch = chapters.find((ch) => ch.id === c.chapterId);
       if (!ch) return;

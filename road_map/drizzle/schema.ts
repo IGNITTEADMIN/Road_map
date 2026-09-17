@@ -1,3 +1,4 @@
+//@drizzle\schema.ts
 import { pgTable, serial, varchar, foreignKey, integer, text, check, char, pgEnum } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 

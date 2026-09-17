@@ -44,6 +44,7 @@ export default function ConceptList({
             order_index={row.orderIndex}
             video_title={row.videoTitle}
             video_url={row.videoUrl}
+            hasQuiz={row.hasQuiz}
             mode={mode}
             targetConceptId={targetConceptId}
           />

@@ -1,10 +1,11 @@
 //@src/db/queries.ts
 import {db} from "./client";
-import {chapter , concept, subjectEnum , quizQuestion, userProgress } from "./schema";
+import {chapter , concept, subjectEnum , quizQuestion, userProgress, trackEnum } from "./schema";
 import {eq, and, asc,sql, desc} from "drizzle-orm";
 import { QuizQuestionRow } from "../types/content";
 
 export type Subject=(typeof subjectEnum.enumValues)[number];
+export type Track = (typeof trackEnum.enumValues)[number]; // "JEE" | "BRIDGE"
 export type QuizQuestionInsert = {
   conceptId: number;
   question: string;
@@ -30,6 +31,7 @@ export type QuizQuestionInsert = {
 export async function insertChapter(
   subject: Subject,
   chapterName: string,
+  track: Track = "JEE",
   clusterTag?: string
 ) {
   const maxOrderRow = await db
@@ -37,15 +39,16 @@ export async function insertChapter(
       maxOrder: sql<number>`MAX("order")`
     })
     .from(chapter)
-    .where(eq(chapter.subject, subject))
+    .where(and(eq(chapter.subject, subject), eq(chapter.track, track))) // 🆕 scoped to both
     .execute();
 
   const nextOrder = (maxOrderRow[0]?.maxOrder ?? 0) + 1;
 
   return await db.insert(chapter).values({
     subject,
+    track, // 🆕
     chapterName,
-    clusterTag: clusterTag ?? chapterName,
+    clusterTag: track === "BRIDGE" ? null : (clusterTag ?? chapterName), // 🆕 Bridge chapters never get a clusterTag
     order: nextOrder,
   });
 }
@@ -56,7 +59,7 @@ export async function insertConcept(chapterId:number, conceptName:string,orderIn
     );
 }
 
-export async function getChaptersBySubject(subjectName: Subject) {
+export async function getChaptersBySubject(subjectName: Subject, track: Track = "JEE") {
   return await db
     .select({
       chapterId: chapter.id,
@@ -64,13 +67,34 @@ export async function getChaptersBySubject(subjectName: Subject) {
       clusterTag: chapter.clusterTag,
     })
     .from(chapter)
-    .where(eq(chapter.subject, subjectName));
+    .where(and(eq(chapter.subject, subjectName), eq(chapter.track, track))); // 🆕
 }
 
-export async function getConceptsByChapter(chapterId: number){
-    return await db.select().from(concept).
-    where(eq(concept.chapterId,chapterId)).
-    orderBy(asc(concept.orderIndex));
+export async function getConceptsByChapter(chapterId: number) {
+  const rows = await db
+    .select({
+      id: concept.id,
+      chapterId: concept.chapterId,
+      conceptName: concept.conceptName,
+      orderIndex: concept.orderIndex,
+      videoTitle: concept.videoTitle,
+      videoUrl: concept.videoUrl,
+      hasQuiz: sql<boolean>`COUNT(${quizQuestion.id}) > 0`, // 🆕 aggregate-based check
+    })
+    .from(concept)
+    .leftJoin(quizQuestion, eq(quizQuestion.conceptId, concept.id)) // 🆕 real join, not raw interpolation
+    .where(eq(concept.chapterId, chapterId))
+    .groupBy(
+      concept.id,
+      concept.chapterId,
+      concept.conceptName,
+      concept.orderIndex,
+      concept.videoTitle,
+      concept.videoUrl
+    ) // 🆕 required since we're aggregating with COUNT
+    .orderBy(asc(concept.orderIndex));
+
+  return rows;
 }
 
 export async function deleteConcept(conceptId:number){

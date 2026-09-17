@@ -4,11 +4,15 @@ import { boolean, date } from "drizzle-orm/pg-core";
 import { uniqueIndex } from "drizzle-orm/pg-core";
 
 export const subjectEnum=pgEnum("subject_enum",["PHYSICS","CHEMISTRY","MATHS",]);
+export const trackEnum = pgEnum("track_enum", ["JEE", "BRIDGE"]);
 
 export const chapter = pgTable("chapter", {
   id: serial("id").primaryKey(),
 
   subject: subjectEnum("subject").notNull(),
+
+  track: trackEnum("track").notNull().default("JEE"),
+
   chapterName: varchar("chapter_name", { length: 150 }).notNull(),
 
   clusterTag: varchar("cluster_tag", { length: 150 }),

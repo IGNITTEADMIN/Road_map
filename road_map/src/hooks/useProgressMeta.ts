@@ -15,7 +15,7 @@ type ChapterMeta = {
 
 type MetaType = Record<string, Record<number, ChapterMeta>>;
 
-export function useProgressMeta() {
+export function useProgressMeta(track: "JEE" | "BRIDGE" = "JEE") { // 🆕 accept track, default JEE
   const [meta, setMeta] = useState<MetaType | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -23,8 +23,9 @@ export function useProgressMeta() {
     let mounted = true;
 
     async function fetchMeta() {
+      setLoading(true); // 🆕 reset loading when track changes
       try {
-        const res = await fetch("/api/progress/meta");
+        const res = await fetch(`/api/progress/meta?track=${track}`); // 🆕 pass track through
         const data = await res.json();
 
         if (mounted) {
@@ -42,7 +43,7 @@ export function useProgressMeta() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [track]); 
 
   return {
     meta,

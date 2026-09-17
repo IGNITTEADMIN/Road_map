@@ -1,3 +1,4 @@
+//@/app/user/providers.tsx
 "use client";
 
 import { ProgressProvider } from "@/src/context/ProgressContext";
