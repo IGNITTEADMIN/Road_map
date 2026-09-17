@@ -4,11 +4,12 @@
 import { ChapterRow } from "@/src/types/content";
 import ChapterList from "@/app/components/ChapterList";
 import { useState } from "react";
+import { Subject } from "@/app/components/SubjectTab";
 
 interface Props {
   clusterName: string;
   chapters: ChapterRow[];
-  subject: string;
+  subject: Subject;
   expanded: boolean;
   onToggle: () => void;
   targetConceptId?: number | null;

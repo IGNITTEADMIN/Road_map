@@ -22,6 +22,7 @@ const contentRows: ContentRow[] = rows.map((row) => {
     orderIndex: Number(r["Order No"]),
     videoTitle: r["Video Name"], 
     videoUrl: r["Video URL"],
+    hasQuiz: false,
   };
 });
 

@@ -4,10 +4,11 @@
 import { useState } from "react";
 import { ChapterRow } from "@/src/types/content";
 import ClusterTab from "@/app/components/ClusterTab";
+import { Subject } from "@/app/components/SubjectTab";
 
 interface Props {
   groupedChapters: Record<string, ChapterRow[]>;
-  subject: string;
+  subject: Subject;
   targetConceptId?: number | null;
   targetChapterId?: number | null;
 }
