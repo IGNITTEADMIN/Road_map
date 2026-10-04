@@ -24,7 +24,7 @@ export default function ConceptList({
   const [showAddDialog, setShowAddDialog] = useState(false);
 
   return (
-    <div className="relative ml-5 mt-2 pl-6 border-l border-white/10 space-y-2">
+    <div className="relative ml-2 mt-2 pl-4 sm:ml-5 sm:pl-6 border-l border-white/10 space-y-2">
       {mode === "admin" && showAddDialog && (
         <AddConceptDialog
           chapterId={chapterId}
