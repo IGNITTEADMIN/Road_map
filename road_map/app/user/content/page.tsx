@@ -219,7 +219,7 @@ useEffect(() => {
                 <Loader show={loading} />
               </div>
             ) : (
-              <div className="rounded-3xl border border-gray-700 bg-gradient-to-br from-black to-gray-900 p-8 shadow-2xl backdrop-blur-sm">
+              <div className="rounded-3xl border border-gray-700 bg-gradient-to-br from-black to-gray-900 p-3 sm:p-8 shadow-2xl backdrop-blur-sm">
                 {track === "BRIDGE" || viewMode === "chapter" ? (
                   <ChapterList
                       subject={selectedSubject}

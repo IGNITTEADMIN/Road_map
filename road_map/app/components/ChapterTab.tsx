@@ -49,9 +49,9 @@ export default function ChapterTab({
 
   return (
     <div
-      className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 cursor-pointer
-      border transition-colors duration-200
-      ${
+      className={`group flex items-center justify-between rounded-2xl px-3 py-3 sm:px-4 sm:py-3.5 cursor-pointer
+border transition-colors duration-200
+${
         isExpanded
           ? "bg-white/[0.06] border-orange-500/50"
           : "bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.05]"

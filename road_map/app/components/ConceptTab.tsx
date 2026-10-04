@@ -228,69 +228,68 @@ function onPlayerStateChange(event: any) {
     if (mode === "admin") toggleShowConcept(true);
   }}
 >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {mode === "user" && (
-    <input
-      type="checkbox"
-      checked={localCompleted}
-      onChange={(e) => {
-        e.stopPropagation();
-        handleToggle();
-      }}
-      className={`w-5 h-5 ${localCompleted ? 'text-green-500' : 'text-orange-500'} bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2`}
-    />
-  )}
-            <div className="flex flex-col">
-              <p
-                  className="text-base font-semibold text-white leading-tight"
-                  style={{ fontFamily: "Inter, sans-serif", letterSpacing: "0.3px" }}
-                >
-                  {conceptName}
-                </p>
-            </div>
-          </div>
-          {mode === "user" && (
-            <div className="flex items-center gap-2">
-              {videoId && (
-                <img
-                  src={thumbnail}
-                  alt="video thumbnail"
-                  width={100}
-                  className="h-16 w-24 rounded-xl object-cover shadow-sm transition group-hover:scale-105"
-                  onClick={(e) => {
-                      e.stopPropagation();
-                      markAccessed(conceptId);
-                      setShowVideo(true);
-                  }}
-                />
-              )}
-              {hasQuiz && ( // 🆕 only render if the concept actually has questions
-                <Button
-                  variant="action"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleShowQuiz(true);
-                  }}
-                >
-                  Take Quiz
-                </Button>
-              )}
-            </div>
-          )}
-          {mode === "admin" && (
-            <Button
-              variant="action"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleShowQuiz(true);
-              }}
-            >
-              Add Quiz
-            </Button>
-          )}
-        </div>
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="flex items-center gap-3 min-w-0">
+      {mode === "user" && (
+        <input
+          type="checkbox"
+          checked={localCompleted}
+          onChange={(e) => {
+            e.stopPropagation();
+            handleToggle();
+          }}
+          className={`w-5 h-5 shrink-0 ${localCompleted ? 'text-green-500' : 'text-orange-500'} bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2`}
+        />
+      )}
+      <div className="flex flex-col min-w-0">
+        <p
+            className="text-base font-semibold text-white leading-snug break-words"
+            style={{ fontFamily: "Inter, sans-serif", letterSpacing: "0.3px" }}
+          >
+            {conceptName}
+          </p>
       </div>
+    </div>
+    {mode === "user" && (
+      <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap sm:justify-end">
+        {videoId && (
+          <img
+            src={thumbnail}
+            alt="video thumbnail"
+            className="h-16 w-28 sm:w-24 rounded-xl object-cover shadow-sm transition group-hover:scale-105 shrink-0"
+            onClick={(e) => {
+                e.stopPropagation();
+                markAccessed(conceptId);
+                setShowVideo(true);
+            }}
+          />
+        )}
+        {hasQuiz && (
+          <Button
+            variant="action"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleShowQuiz(true);
+            }}
+          >
+            Take Quiz
+          </Button>
+        )}
+      </div>
+    )}
+    {mode === "admin" && (
+      <Button
+        variant="action"
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleShowQuiz(true);
+        }}
+      >
+        Add Quiz
+      </Button>
+    )}
+  </div>
+</div>
     </>
   );
 }
