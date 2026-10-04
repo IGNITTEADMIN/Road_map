@@ -15,7 +15,7 @@ export default function PostLoginPage() {
       const user = await res.json();
 
       if (!user.profileCompleted) {
-        window.location.href = "/profile/setup";
+        window.location.href = "/profile";
       } else {
         window.location.href = "/user/content";
       }

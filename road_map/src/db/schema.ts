@@ -1,5 +1,5 @@
 //@src/db/schema.ts
-import { pgEnum, pgTable, serial, varchar, text, integer, char, timestamp } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, serial, varchar, text, integer, char, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { boolean, date } from "drizzle-orm/pg-core";
 import { uniqueIndex } from "drizzle-orm/pg-core";
 
@@ -67,25 +67,18 @@ export const quizQuestion = pgTable("quiz_question", {
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-
   googleId: varchar("google_id", { length: 255 }).notNull().unique(),
-
   name: varchar("name", { length: 255 }),
-
   email: varchar("email", { length: 255 }).notNull().unique(),
-
   avatarUrl: text("avatar_url"),
-
   dateOfBirth: date("date_of_birth"),
   schoolName: varchar("school_name", { length: 255 }),
   district: varchar("district", { length: 100 }),
   classStudying: varchar("class_studying", { length: 20 }),
   phoneNumber: varchar("phone_number", { length: 15 }),
-
   profileCompleted: boolean("profile_completed").default(false),
-
   role: varchar("role", { length: 20 }).default("user"),
-
+  isOB: boolean("is_ob").default(false), // 🆕
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -116,3 +109,29 @@ export const userProgress = pgTable(
     ),
   })
 );
+
+export const eventTypeEnum = pgEnum("event_type_enum", [
+  "video_access",
+  "video_progress",
+  "quiz_attempt",
+]);
+
+export const learningEvent = pgTable("learning_event", {
+  id: serial("id").primaryKey(),
+
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+
+  conceptId: integer("concept_id")
+    .notNull()
+    .references(() => concept.id, { onDelete: "cascade" }),
+
+  eventType: eventTypeEnum("event_type").notNull(),
+
+  score: integer("score"),
+
+  metadata: jsonb("metadata"),
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

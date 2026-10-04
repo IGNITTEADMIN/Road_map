@@ -1,4 +1,3 @@
-//./app/api/progress/meta/route.ts
 import { NextResponse } from "next/server";
 import { db } from "@/src/db/client";
 import { chapter, concept } from "@/src/db/schema";
@@ -25,7 +24,14 @@ export async function GET(req: Request) {
 
     const map: Record<
       string,
-      Record<number, { order: number; concepts: { id: number; orderIndex: number }[] }>
+      Record<
+        number,
+        {
+          order: number;
+          chapterName: string; // 🆕
+          concepts: { id: number; orderIndex: number; conceptName: string }[]; // 🆕
+        }
+      >
     > = {
       PHYSICS: {},
       CHEMISTRY: {},
@@ -37,6 +43,7 @@ export async function GET(req: Request) {
 
       map[ch.subject][ch.id] = {
         order: ch.order,
+        chapterName: ch.chapterName, // 🆕
         concepts: [],
       };
     });
@@ -48,6 +55,7 @@ export async function GET(req: Request) {
       map[ch.subject][ch.id].concepts.push({
         id: c.id,
         orderIndex: c.orderIndex,
+        conceptName: c.conceptName, // 🆕
       });
     });
 

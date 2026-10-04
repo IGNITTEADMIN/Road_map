@@ -55,6 +55,10 @@ export default function Navbar() {
             <Link href="/admin" className={buttonClass}>Admin</Link>
           )}
 
+          {session && isAdmin && (
+            <Link href="/admin/analyse" className={buttonClass}>Analyse</Link>
+          )}
+
           {session && (
             <Link href="/user/dashboard" className={buttonClass}>
               Dashboard
@@ -92,6 +96,10 @@ export default function Navbar() {
 
     {session && isAdmin && (
       <Link href="/admin" className={buttonClass}>Admin</Link>
+    )}
+
+    {session && isAdmin && (
+      <Link href="/admin/analyse" className={buttonClass}>Analyse</Link>
     )}
 
     {session && (

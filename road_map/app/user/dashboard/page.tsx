@@ -1,3 +1,4 @@
+//@app/user/dashboard/page.tsx
 "use client";
 
 import { useProgressContext } from "@/src/context/ProgressContext";
@@ -11,220 +12,106 @@ type SubjectStat = {
   total: number;
 };
 
+const SUBJECT_COLORS: Record<string, string> = {
+  PHYSICS: "#3b82f6",
+  CHEMISTRY: "#a855f7",
+  MATHS: "#10b981",
+};
+
+function DotBar({
+  value,
+  total,
+  color,
+  segments = 28,
+}: {
+  value: number;
+  total: number;
+  color: string;
+  segments?: number;
+}) {
+  const pct = total > 0 ? value / total : 0;
+  const filled = value > 0 ? Math.max(1, Math.round(pct * segments)) : 0;
+
+  return (
+    <div
+      className="grid gap-[3px] w-full min-w-0"
+      style={{ gridTemplateColumns: `repeat(${segments}, minmax(0, 1fr))` }}
+    >
+      {Array.from({ length: segments }, (_, i) => (
+        <div
+          key={i}
+          className="h-3.5 rounded-[3px]"
+          style={{ background: i < filled ? color : "#201c44" }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { progress, streak, loading: progressLoading } = useProgressContext();
   const { meta, loading: metaLoading } = useProgressMeta();
 
-if (progressLoading || metaLoading) {
-  return <Loader show={true} />;
-}
-
-  if (!meta) {
-    return <div>Error loading data</div>;
+  if (progressLoading || metaLoading) {
+    return <Loader show={true} />;
   }
 
-  const { totalConcepts, completedConcepts, subjectStats } =
-    computeStats(meta, progress);
+  if (!meta) {
+    return <div className="text-white text-center py-20">Error loading data</div>;
+  }
 
-  // ✅ Typed properly
-  const getProgressColor = (percentage: number): string => {
-    if (percentage <= 25) return "stroke-blue-500";
-    if (percentage <= 50) return "stroke-cyan-400";
-    if (percentage <= 75) return "stroke-teal-400";
-    return "stroke-green-400";
-  };
-
-  // ✅ Proper React component typing
- const ArcProgress = ({
-  value,
-  total,
-}: {
-  value: number;
-  total: number;
-}) => {
-  const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-
-  const radius = 70;
-  const centerX = 100;
-  const centerY = 100;
-
-  // Dot sizing
-  const dotSize = 8; // diameter
-  const spacing = 4;
-
-  // ✅ Calculate dots dynamically based on arc length
-  const arcLength = Math.PI * radius;
-  const totalDots = Math.floor(arcLength / (dotSize + spacing));
-
-  const filledDots = Math.round((percentage / 100) * totalDots);
-
-  // ✅ Smooth color transition across arc
-  const getDotColor = (index: number): string => {
-    const ratio = index / totalDots;
-    if (ratio <= 0.33) return "#3b82f6"; // blue-500
-    if (ratio <= 0.66) return "#22d3ee"; // cyan-400
-    return "#14b8a6"; // teal-500
-  };
+  const { totalConcepts, completedConcepts, subjectStats } = computeStats(meta, progress);
 
   return (
-    <svg width={200} height={140} viewBox="0 0 200 140">
-      {Array.from({ length: totalDots }, (_, i: number) => {
-  const angle =
-    Math.PI * ((i + 0.5) / totalDots); // ✅ perfectly centered
+    <div className="bg-black min-h-screen">
+      <div className="max-w-4xl mx-auto px-2 md:px-6 py-10">
 
-  const x = centerX + radius * Math.sin(angle);
-  const y = centerY - radius * Math.cos(angle);
+        {/* Main panel */}
+        <div className="rounded-2xl border border-indigo-500/40 bg-[#10102a] p-7">
 
-  return (
-    <circle
-      key={i}
-      cx={x}
-      cy={y}
-      r={dotSize / 2}
-      fill={i < filledDots ? getDotColor(i) : "#374151"}
-    />
-  );
-})}
+          {/* Overall progress header */}
+          <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+            <h2 className="text-lg font-extrabold text-white tracking-wide">
+              OVERALL PROGRESS{" "}
+              <span className="text-cyan-400">
+                {completedConcepts} / {totalConcepts}
+              </span>
+            </h2>
 
-      {/* Center text */}
-      <text
-        x={centerX}
-        y={centerY - 10}
-        textAnchor="middle"
-        className="fill-white font-bold text-xl font-mono"
-      >
-        {percentage}%
-      </text>
-    </svg>
-  );
-};
-  const CircularProgress = ({
-    value,
-    total,
-    size = 80,
-    strokeWidth = 8,
-    color,
-  }: {
-    value: number;
-    total: number;
-    size?: number;
-    strokeWidth?: number;
-    color?: string;
-  }) => {
-    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+            <div className="flex items-center gap-2 border border-yellow-500/60 rounded-full px-4 py-1.5 bg-yellow-500/5">
+              <span className="text-lg">🔥</span>
+              <span className="text-yellow-300 font-bold text-sm">{streak}-day streak</span>
+            </div>
+          </div>
 
-    const radius = (size - strokeWidth) / 2;
-    const circumference = 2 * Math.PI * radius;
-    const strokeDashoffset =
-      circumference - (percentage / 100) * circumference;
+          <DotBar value={completedConcepts} total={totalConcepts} color="#22d3ee" segments={28} />
 
-    const colorClass = color || getProgressColor(percentage);
-
-    return (
-      <svg width={size} height={size} className="-rotate-90">
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          fill="transparent"
-          className="text-gray-700"
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          fill="transparent"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          className={colorClass}
-          strokeLinecap="round"
-        />
-        <text
-          x={size / 2}
-          y={size / 2}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          className="fill-current text-white font-semibold font-mono"
-          transform={`rotate(90 ${size / 2} ${size / 2})`}
-        >
-          {percentage}%
-        </text>
-      </svg>
-    );
-  };
-
-  return (
-    <div>
-      <h1 className="text-2xl font-semibold text-center mb-6">
-        Dashboard
-      </h1>
-
-      <div className="rounded-2xl bg-gradient-to-r from-[#1a1a2e] to-[#16213e] p-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <CircularProgress
-            value={completedConcepts}
-            total={totalConcepts}
-            size={100}
-            strokeWidth={10}
-          />
-          <div>
-            <p className="text-white font-semibold">Overall Progress</p>
-            <p className="text-white">
-              {completedConcepts} / {totalConcepts}
-            </p>
+          {/* Per-subject rows */}
+          <div className="mt-9 space-y-7">
+            {Object.entries(subjectStats as Record<string, SubjectStat>).map(([subject, stats]) => (
+              <div key={subject} className="flex items-center gap-5">
+                <p className="w-24 text-sm font-extrabold text-white tracking-wide shrink-0">
+                  {subject}
+                </p>
+                <DotBar
+  value={stats.completed}
+  total={stats.total}
+  color={SUBJECT_COLORS[subject] ?? "#22d3ee"}
+  segments={22}
+/>
+                <p className="w-20 text-right text-sm text-indigo-300 shrink-0">
+                  {stats.completed}/{stats.total}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* 🔥 Enlarged streak */}
-        <div className="flex items-center gap-3 text-white ml-8">
-          <span className="text-4xl">🔥</span>
-          <span className="text-3xl font-bold">{streak}</span>
+        {/* Continue learning */}
+        <div className="mt-6">
+          <ContinueLearning progress={progress} />
         </div>
-      </div>
 
-      <div className="flex justify-center gap-6 mt-10 flex-wrap">
-        {Object.entries(subjectStats as Record<string, SubjectStat>).map(
-          ([subject, stats]) => {
-            const percentage = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
-            const getBorderColor = (perc: number) => {
-              if (perc <= 25) return 'border-blue-500/30';
-              if (perc <= 50) return 'border-cyan-400/30';
-              if (perc <= 75) return 'border-teal-400/30';
-              return 'border-green-400/30';
-            };
-            const borderClass = getBorderColor(percentage);
-            const bgClass = subject === 'PHYSICS' ? 'bg-[#1a1a2e]' : subject === 'CHEMISTRY' ? 'bg-[#16213e]' : 'bg-[#0f3460]';
-            const subjectColor = subject === 'PHYSICS' ? 'text-blue-500' : subject === 'CHEMISTRY' ? 'text-purple-500' : 'text-emerald-500';
-            return (
-              <div
-                key={subject}
-                className={`rounded-2xl p-6 w-[160px] flex flex-col items-center justify-center shadow-md ${bgClass} hover:scale-105 transition-transform duration-200 border ${borderClass}`}
-              >
-                <CircularProgress
-                  value={stats.completed}
-                  total={stats.total}
-                  size={90}
-                  strokeWidth={10}
-                  color={subjectColor}
-                />
-                <p className="text-white font-semibold mt-3 text-sm tracking-wide">
-                  {subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase()}
-                </p>
-                <p className="text-gray-300 text-sm">
-                  {stats.completed} / {stats.total}
-                </p>
-              </div>
-            );
-          }
-        )}
-      </div>
-
-      <div className="mt-8">
-        <ContinueLearning progress={progress} />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 //@src/db/queries.ts
 import {db} from "./client";
-import {chapter , concept, subjectEnum , quizQuestion, userProgress, trackEnum } from "./schema";
+import { chapter, concept, subjectEnum, quizQuestion, userProgress, trackEnum, learningEvent, users } from "./schema";
 import {eq, and, asc,sql, desc} from "drizzle-orm";
 import { QuizQuestionRow } from "../types/content";
 
@@ -214,10 +214,38 @@ export async function upsertUserProgress({
   }
 }
 
+export async function logLearningEvent({
+  userId,
+  conceptId,
+  eventType,
+  score,
+  metadata,
+}: {
+  userId: number;
+  conceptId: number;
+  eventType: "video_access" | "video_progress" | "quiz_attempt";
+  score?: number;
+  metadata?: Record<string, unknown>;
+}) {
+  return await db.insert(learningEvent).values({
+    userId,
+    conceptId,
+    eventType,
+    score,
+    metadata,
+  });
+}
+
 export async function markConceptAccessedDB(
   userId: number,
   conceptId: number
 ) {
+  await logLearningEvent({
+    userId,
+    conceptId,
+    eventType: "video_access",
+  });
+
   return await upsertUserProgress({
     userId,
     conceptId,
@@ -244,4 +272,54 @@ export async function unmarkConceptCompletedDB(
     conceptId,
     completed: false,
   });
+}
+
+export async function getOBUsers() {
+  return await db
+    .select({ id: users.id, name: users.name, email: users.email })
+    .from(users)
+    .where(eq(users.isOB, true));
+}
+
+export async function getLearningEventsByUserAndTrack(userId: number, track: Track) {
+  return await db
+    .select({
+      id: learningEvent.id,
+      conceptId: learningEvent.conceptId,
+      conceptName: concept.conceptName,
+      chapterName: chapter.chapterName, // 🆕
+      eventType: learningEvent.eventType,
+      score: learningEvent.score,
+      metadata: learningEvent.metadata,
+      createdAt: learningEvent.createdAt,
+    })
+    .from(learningEvent)
+    .innerJoin(concept, eq(learningEvent.conceptId, concept.id))
+    .innerJoin(chapter, eq(concept.chapterId, chapter.id))
+    .where(and(eq(learningEvent.userId, userId), eq(chapter.track, track)))
+    .orderBy(asc(learningEvent.createdAt));
+}
+
+export async function getUserProgressByTrack(userId: number, track: Track) {
+  return await db
+    .select({
+      conceptId: userProgress.conceptId,
+      completed: userProgress.completed,
+      score: userProgress.score,
+      lastAccessedAt: userProgress.lastAccessedAt,
+      updatedAt: userProgress.updatedAt,
+    })
+    .from(userProgress)
+    .innerJoin(concept, eq(userProgress.conceptId, concept.id))
+    .innerJoin(chapter, eq(concept.chapterId, chapter.id))
+    .where(and(eq(userProgress.userId, userId), eq(chapter.track, track)));
+}
+
+export async function getTotalConceptsByTrack(track: Track) {
+  const rows = await db
+    .select({ conceptId: concept.id })
+    .from(concept)
+    .innerJoin(chapter, eq(concept.chapterId, chapter.id))
+    .where(eq(chapter.track, track));
+  return rows.length;
 }

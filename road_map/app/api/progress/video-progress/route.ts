@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { markQuizAttempted, logQuizAttemptEvent } from "@/src/services/progressService";
+import { logVideoProgress } from "@/src/services/progressService";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/src/db/client";
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { conceptId, score, timeTakenSeconds } = await req.json();
+    const { conceptId, percentWatched, watchedSeconds, durationSeconds } = await req.json();
 
     const user = await db
       .select({ id: users.id })
@@ -22,8 +22,11 @@ export async function POST(req: Request) {
 
     const userId = user[0].id;
 
-    await markQuizAttempted(userId, conceptId, score);
-    await logQuizAttemptEvent(userId, conceptId, score, timeTakenSeconds ?? 0);
+    await logVideoProgress(userId, conceptId, {
+      percentWatched,
+      watchedSeconds,
+      durationSeconds,
+    });
 
     return NextResponse.json({ success: true });
   } catch (err) {

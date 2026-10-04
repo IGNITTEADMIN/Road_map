@@ -8,6 +8,7 @@ import ConceptDisplay from "@/app/components/dialogBoxes/ConceptDisplay";
 import QuizPanel from "@/app/components/quiz/QuizPanel";   
 import QuizAttemptPanel from "@/app/components/quiz/QuizAttemptPanel";
 import { useProgressContext } from "@/src/context/ProgressContext";
+import { createPortal } from "react-dom";
 
 interface Props {
   chapterId: number;
@@ -37,7 +38,8 @@ export default function ConceptTab({
   const [showConcept, toggleShowConcept] = useState(false);
   const [showQuiz, toggleShowQuiz] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
-  
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const ctx = useProgressContext();
 
@@ -87,36 +89,117 @@ export default function ConceptTab({
   const videoId = getYoutubeId(video_url);
   const thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
+  const playerRef = useRef<any>(null);
+const milestonesLoggedRef = useRef<Set<number>>(new Set());
+
+useEffect(() => {
+  if (!showVideo || !videoId) return;
+
+  function createPlayer() {
+    playerRef.current = new (window as any).YT.Player(`yt-player-${conceptId}`, {
+      videoId,
+      width: 800,
+      height: 450,
+      events: {
+        onStateChange: onPlayerStateChange,
+      },
+    });
+  }
+
+  function loadYouTubeAPI() {
+    if ((window as any).YT && (window as any).YT.Player) {
+      createPlayer();
+      return;
+    }
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
+    (window as any).onYouTubeIframeAPIReady = createPlayer;
+  }
+
+  milestonesLoggedRef.current = new Set();
+  loadYouTubeAPI();
+
+  return () => {
+    if (playerRef.current?.destroy) {
+      playerRef.current.destroy();
+      playerRef.current = null;
+    }
+  };
+}, [showVideo, videoId]);
+
+function sendProgress(percentWatched: number, watchedSeconds: number, durationSeconds: number) {
+  fetch("/api/progress/video-progress", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ conceptId, percentWatched, watchedSeconds, durationSeconds }),
+  }).catch((err) => console.error(err));
+}
+
+function checkMilestones() {
+  const player = playerRef.current;
+  if (!player?.getDuration) return;
+
+  const duration = player.getDuration();
+  const current = player.getCurrentTime();
+  if (!duration) return;
+
+  const percent = Math.round((current / duration) * 100);
+  const milestones = [25, 50, 75, 100];
+
+  for (const m of milestones) {
+    if (percent >= m && !milestonesLoggedRef.current.has(m)) {
+      milestonesLoggedRef.current.add(m);
+      sendProgress(m, Math.round(current), Math.round(duration));
+    }
+  }
+}
+
+function onPlayerStateChange(event: any) {
+  const YT_PLAYING = 1;
+  const YT_PAUSED = 2;
+  const YT_ENDED = 0;
+
+  if (event.data === YT_PLAYING) {
+    const interval = setInterval(() => {
+      if (playerRef.current?.getPlayerState?.() !== YT_PLAYING) {
+        clearInterval(interval);
+        return;
+      }
+      checkMilestones();
+    }, 5000);
+  }
+
+  if (event.data === YT_PAUSED || event.data === YT_ENDED) {
+    checkMilestones();
+  }
+}
+
   return (
     <>
         
-      {showVideo && (
-        <div
-          style={{
-            position: "fixed",
-            top: "1rem",
-            left: "1rem",
-            right: "1rem",
-            bottom: "1rem",
-            background: "rgba(0,0,0,0.7)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-          onClick={() => setShowVideo(false)}
-        >
-          <div onClick={(e) => e.stopPropagation()}>
-            <iframe
-              width="800"
-              height="450"
-              src={`https://www.youtube.com/embed/${videoId}`}
-              title="YouTube video"
-              allowFullScreen
-            />
-          </div>
+      {showVideo && mounted && createPortal(
+      <div
+        style={{
+          position: "fixed",
+          top: "1rem",
+          left: "1rem",
+          right: "1rem",
+          bottom: "1rem",
+          background: "rgba(0,0,0,0.7)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 1000,
+        }}
+        onClick={() => setShowVideo(false)}
+      >
+        <div onClick={(e) => e.stopPropagation()}>
+          <div id={`yt-player-${conceptId}`} style={{ width: 800, height: 450 }} />
         </div>
-      )}
+      </div>,
+      document.body
+    )}
 
       {showConcept && (
         <ConceptDisplay
