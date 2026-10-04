@@ -20,22 +20,37 @@ export default function ProfilePage() {
   }
 
   async function handleSubmit() {
-    
-    const res = await fetch("/api/user/profile", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
+  const requiredFields: (keyof typeof form)[] = [
+    "name",
+    "dob",
+    "school",
+    "district",
+    "classStudying",
+    "phone",
+  ];
 
-    if (res.ok) {
-      await update();
-      window.location.href = "/learn";
-    } else {
-      alert("Failed to save profile");
-    }
+  const missing = requiredFields.filter((field) => !form[field]?.trim());
+
+  if (missing.length > 0) {
+    alert("Please fill in all fields before submitting.");
+    return;
   }
+
+  const res = await fetch("/api/user/profile", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(form),
+  });
+
+  if (res.ok) {
+    await update();
+    window.location.href = "/learn";
+  } else {
+    alert("Failed to save profile");
+  }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">

@@ -1,6 +1,13 @@
 type MetaType = Record<
   string,
-  Record<number, { order: number; concepts: { id: number; orderIndex: number }[] }>
+  Record<
+    number,
+    {
+      order: number;
+      chapterName: string;
+      concepts: { id: number; orderIndex: number; conceptName: string }[];
+    }
+  >
 >;
 
 type ProgressType = Record<
@@ -54,7 +61,6 @@ export function getNextConcept(meta: any, progress: any) {
   let latestConceptId: number | null = null;
   let latestTime = 0;
 
-  // 1. Find most recently interacted concept
   for (const conceptId in progress) {
     const p = progress[conceptId];
     const time = new Date(p.lastAccessedAt || p.updatedAt || 0).getTime();
@@ -65,7 +71,6 @@ export function getNextConcept(meta: any, progress: any) {
     }
   }
 
-  // 2. Traverse meta in order
   for (const subject of Object.keys(meta)) {
     const chapters = meta[subject];
 
@@ -73,7 +78,7 @@ export function getNextConcept(meta: any, progress: any) {
       ([, a]: any, [, b]: any) => a.order - b.order
     );
 
-    for (const [chapterId, chapter] of sortedChapters as any){
+    for (const [chapterId, chapter] of sortedChapters as any) {
       const sortedConcepts = chapter.concepts.sort(
         (a: any, b: any) => a.orderIndex - b.orderIndex
       );
@@ -81,26 +86,28 @@ export function getNextConcept(meta: any, progress: any) {
       for (let i = 0; i < sortedConcepts.length; i++) {
         const concept = sortedConcepts[i];
 
-        // 3. If this is last interacted → return next
         if (concept.id === latestConceptId) {
           if (sortedConcepts[i + 1]) {
             return {
               conceptId: sortedConcepts[i + 1].id,
+              conceptName: sortedConcepts[i + 1].conceptName, // 🆕
               chapterId: Number(chapterId),
+              chapterName: chapter.chapterName, // 🆕
               subject,
             };
           }
 
-          // move to next chapter
           const nextChapter = sortedChapters.find(
             ([id]: any) => Number(id) > Number(chapterId)
           );
-            
+
           if (nextChapter) {
             const nextCh = nextChapter[1] as any;
             return {
               conceptId: nextCh.concepts[0]?.id,
+              conceptName: nextCh.concepts[0]?.conceptName, // 🆕
               chapterId: Number(nextChapter[0]),
+              chapterName: nextCh.chapterName, // 🆕
               subject,
             };
           }
@@ -109,7 +116,6 @@ export function getNextConcept(meta: any, progress: any) {
     }
   }
 
-  // 4. Fallback → first uncompleted
   for (const subject of Object.keys(meta)) {
     const chapters = meta[subject];
 
@@ -117,7 +123,7 @@ export function getNextConcept(meta: any, progress: any) {
       ([, a]: any, [, b]: any) => a.order - b.order
     );
 
-    for (const [chapterId, chapter] of sortedChapters as any){
+    for (const [chapterId, chapter] of sortedChapters as any) {
       const sortedConcepts = chapter.concepts.sort(
         (a: any, b: any) => a.orderIndex - b.orderIndex
       );
@@ -126,7 +132,9 @@ export function getNextConcept(meta: any, progress: any) {
         if (!progress[concept.id]?.completed) {
           return {
             conceptId: concept.id,
+            conceptName: concept.conceptName, // 🆕
             chapterId: Number(chapterId),
+            chapterName: chapter.chapterName, // 🆕
             subject,
           };
         }
@@ -134,5 +142,5 @@ export function getNextConcept(meta: any, progress: any) {
     }
   }
 
-  return null; // all done
+  return null;
 }

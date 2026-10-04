@@ -1,7 +1,6 @@
 //./api/components/ChapterList.tsx
 "use client";
-
-import {useState ,useEffect} from "react";
+import { useState, useEffect, useRef } from "react";
 import ChapterTab from "./ChapterTab";
 import {ContentRow, ChapterRow} from "@/src/types/content";
 import { Subject } from "@/app/components/SubjectTab";
@@ -63,17 +62,41 @@ export default function ChapterList({
         }
         
     }
-    useEffect(() => {
-        if (initialChapterId) {
-            handleClick(initialChapterId);
-        }
-        }, [initialChapterId]);
+        const handledTargetRef = useRef<number | null>(null);
+const handledInitialRef = useRef<number | null>(null);
 
-        useEffect(() => {
-  if (targetChapterId && rows.some(r => r.chapterId === targetChapterId)) {
-    handleClick(targetChapterId);
-  }
-}, [targetChapterId]);
+useEffect(() => {
+  if (!initialChapterId) return;
+  if (rows.length === 0) return;
+  if (handledInitialRef.current === initialChapterId) return;
+  handledInitialRef.current = initialChapterId;
+
+  setExpandedChapterId(initialChapterId);
+  changeConcepts([]);
+  setLoadingChapterId(initialChapterId);
+  fetch(`/api/chapters/concepts/get?chapterId=${initialChapterId}`)
+    .then((res) => res.json())
+    .then((data) => changeConcepts(data))
+    .catch((err) => console.log(err))
+    .finally(() => setLoadingChapterId(null));
+}, [initialChapterId, rows]);
+
+useEffect(() => {
+  if (!targetChapterId) return;
+  if (rows.length === 0) return;
+  if (!rows.some((r) => r.chapterId === targetChapterId)) return;
+  if (handledTargetRef.current === targetChapterId) return;
+  handledTargetRef.current = targetChapterId;
+
+  setExpandedChapterId(targetChapterId);
+  changeConcepts([]);
+  setLoadingChapterId(targetChapterId);
+  fetch(`/api/chapters/concepts/get?chapterId=${targetChapterId}`)
+    .then((res) => res.json())
+    .then((data) => changeConcepts(data))
+    .catch((err) => console.log(err))
+    .finally(() => setLoadingChapterId(null));
+}, [targetChapterId, rows]);
 
     
     

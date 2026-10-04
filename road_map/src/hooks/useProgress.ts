@@ -86,24 +86,24 @@ const toggleComplete = async (conceptId: number, completed: boolean) => {
   };
 
   // 🔹 Quiz attempt
-  const attemptQuiz = async (conceptId: number, score: number) => {
-    if (isUpdatingRef.current) return;
-    isUpdatingRef.current = true;
+  const attemptQuiz = async (conceptId: number, score: number, timeTakenSeconds: number) => {
+        if (isUpdatingRef.current) return;
+        isUpdatingRef.current = true;
 
-    try {
-      await fetch("/api/progress/quiz-attempt", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ conceptId, score }),
-      });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      isUpdatingRef.current = false;
-    }
-  };
+        try {
+          await fetch("/api/progress/quiz-attempt", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ conceptId, score, timeTakenSeconds }),
+          });
+        } catch (err) {
+          console.error(err);
+        } finally {
+          isUpdatingRef.current = false;
+        }
+      };
 
   return {
     progress,

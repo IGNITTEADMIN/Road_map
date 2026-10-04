@@ -36,6 +36,20 @@
       "when": 1788105567855,
       "tag": "0004_third_matthew_murdock",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790688897988,
+      "tag": "0005_rare_wild_child",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790690435616,
+      "tag": "0006_soft_maestro",
+      "breakpoints": true
     }
   ]
 }

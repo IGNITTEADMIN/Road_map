@@ -8,6 +8,7 @@ import ProgressBar from "./ProgressBar";
 import QuestionList from "./QuestionList";
 import { useProgressContext } from "@/src/context/ProgressContext";
 import Button from "@/app/components/ui/Button";
+import { createPortal } from "react-dom";
 
 interface Props {
   conceptId: number;
@@ -25,8 +26,11 @@ export default function QuizAttemptPanel({
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [answers, setAnswers] = useState<Record<number, number | null>>({});
   const [timeLeft, setTimeLeft] = useState(120);
+  const [startTime] = useState(() => Date.now());
   const [quizFinished, setQuizFinished] = useState(false);
   const { attemptQuiz } = useProgressContext();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   function calculateScore() {
     let score = 0;
@@ -66,10 +70,11 @@ export default function QuizAttemptPanel({
   }, [quizFinished]);
 
   useEffect(() => {
-    if (!quizFinished) return;
-    const score = calculateScore();
-    attemptQuiz(conceptId, score);
-  }, [quizFinished]);
+      if (!quizFinished) return;
+      const score = calculateScore();
+      const timeTakenSeconds = Math.round((Date.now() - startTime) / 1000);
+      attemptQuiz(conceptId, score, timeTakenSeconds);
+    }, [quizFinished]);
 
   function handleSelect(optionIndex: number) {
     setSelectedOption(optionIndex);
@@ -103,7 +108,7 @@ export default function QuizAttemptPanel({
         ? { ring: "#ff6b00", label: "Good job — keep improving 🚀", chip: "text-orange-400" }
         : { ring: "#ef4444", label: "Keep practicing, you'll get there 💪", chip: "text-red-400" };
 
-    return (
+    return mounted ? createPortal(
       <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4">
         <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#111113] p-8 shadow-2xl text-white text-center">
           <p className="text-xs font-semibold tracking-widest text-white/40 mb-2">
@@ -145,14 +150,15 @@ export default function QuizAttemptPanel({
             Close
           </Button>
         </div>
-      </div>
-    );
+      </div>,
+    document.body
+    ): null;
   }
 
   const q = questions[current];
   if (!q) return null;
 
-  return (
+  return mounted ? createPortal(
     <div className="fixed inset-4 z-50 flex items-center justify-center bg-black/70">
       <div className="w-full h-full max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-[#111113] p-5 shadow-2xl">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -200,6 +206,7 @@ export default function QuizAttemptPanel({
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>,
+  document.body
+  ): null;
 }

@@ -8,7 +8,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("555555555555555555555555555555555555555555555][]]]]]]]]]]]]]]]]]");
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
@@ -26,16 +25,28 @@ export async function POST(req: NextRequest) {
       phone,
     } = body;
 
+    const requiredFields = { name, dob, school, district, classStudying, phone };
+    const missing = Object.entries(requiredFields)
+      .filter(([, value]) => !value || !String(value).trim())
+      .map(([key]) => key);
+
+    if (missing.length > 0) {
+      return NextResponse.json(
+        { error: `Missing required fields: ${missing.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
     await db
       .update(users)
       .set({
         name,
-        dateOfBirth: dob || null,
+        dateOfBirth: dob,
         schoolName: school,
         district,
         classStudying,
         phoneNumber: phone,
-        profileCompleted: true, // ✅ important
+        profileCompleted: true,
       })
       .where(eq(users.email, session.user.email));
 
